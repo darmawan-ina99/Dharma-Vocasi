@@ -331,12 +331,19 @@ function cleanHTML(h){
 const MV = {
   url: 'https://whtsromktkymksuvagrw.supabase.co/rest/v1/rpc/',
   key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndodHNyb21rdGt5bWtzdXZhZ3J3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzNTMzMTIsImV4cCI6MjEwNjkyOTMxMn0.Ey3dgYFJP0rI57eBkNtFgJjl_Qf-KI0H7dpfD_t4Kos', app: 'mv-DJOrpw5N0iMIELtz',
-  dk: null, busy: false
+  dk: null, us: null, busy: false
 };
 try { MV.dk = localStorage.getItem('mv_key') || null; } catch (e) {}
 if (!MV.dk) {
   MV.dk = 'mv-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
   try { localStorage.setItem('mv_key', MV.dk); } catch (e) {}
+}
+// PATCH KEAMANAN: rahasia kepemilikan per-pengguna.
+// mv_up hanya menerima tulisan jika usecret cocok -> data tidak bisa ditimpa pemilik akun palsu
+try { MV.us = localStorage.getItem('mv_sec') || null; } catch (e) {}
+if (!MV.us) {
+  MV.us = 'us-' + Math.random().toString(36).slice(2, 14) + Date.now().toString(36);
+  try { localStorage.setItem('mv_sec', MV.us); } catch (e) {}
 }
 function mvRpc(fn, body) {
   return fetch(MV.url + fn, {
@@ -349,7 +356,7 @@ function pushSync() {
   if (MV.busy) return; MV.busy = true;
   var arr = [];
   for (var id in S.done) arr.push({ id: id, s: S.done[id].score });
-  mvRpc('mv_up', { p_app: MV.app, p_key: MV.dk, p_name: S.name || '', p_city: S.city || '', p_prog: arr })
+  mvRpc('mv_up', { p_app: MV.app, p_key: MV.dk, p_name: S.name || '', p_city: S.city || '', p_prog: arr, p_usecret: MV.us })
     .then(function () { MV.busy = false; })
     .catch(function () { MV.busy = false; setTimeout(pushSync, 20000); });
 }
