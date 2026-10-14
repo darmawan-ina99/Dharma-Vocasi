@@ -550,7 +550,7 @@ let curList=null,curTitle='',curDesc='';
 function unitRow(u){
   const d=S.done[u.id];
   const st=d?(d.score>=70?'<span class="stat st-pass">✓ '+d.score+'</span>':'<span class="stat st-try">⟳ '+d.score+'</span>'):'';
-  const bd=u.status==='demo'?' <span class="badge-demo">DEMO</span>':'';
+  const bd=u.status==='demo'?' <span class="badge-demo">DEMO</span>':(u.status==='draft'?' <span class="badge-demo" style="background:#1e2a38;color:#7ec8ff">DRAFT</span>':'');
   const belum=(u.status==='struktur'||!u.materi||!u.soal||!u.soal.length)?' <small style="color:var(--dim)">(materi belum tersedia)</small>':'';
   const fv=(S.fav&&S.fav[u.id])?'★':'☆';
   const sek=(u.track==='sd'||u.track==='smp'||u.track==='sma'||u.track==='smk')?('Kelas '+u.kelas+' · '):((u.level||'')!==''?u.level+' · ':'');
