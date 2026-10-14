@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin — Maestro Vokasi</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0D0D0D;--card:#16161d;--line:#2a2a33;--gold:#d4a017;--gold2:#f5c518;--acc:#00d4aa;--txt:#f0f0f5;--dim:#a6a6b8}
+body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',system-ui,sans-serif;line-height:1.6;padding:20px 14px 80px;max-width:680px;margin:0 auto}
+h1{font-family:Syne;font-size:22px;margin-bottom:2px}
+.sub{color:var(--dim);font-size:12.5px;margin-bottom:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+label{display:block;font-size:12px;color:var(--dim);margin:10px 0 5px}
+input,textarea,select{width:100%;background:#1d1d26;border:1.5px solid var(--line);border-radius:10px;color:var(--txt);padding:11px;font-size:14px;font-family:inherit}
+textarea{min-height:120px;resize:vertical}
+.btn{width:100%;background:linear-gradient(135deg,#f5c518,#d4a017);color:#000;border:none;border-radius:12px;padding:13px;font-weight:700;font-size:15px;font-family:inherit;cursor:pointer;margin-top:12px}
+.btn.alt{background:transparent;border:1.5px solid var(--line);color:var(--txt)}
+.btn.red{background:transparent;border:1.5px solid #f87171;color:#f87171}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>div{flex:1;min-width:120px}
+.stat{display:inline-block;background:#1d1d26;border:1px solid var(--line);border-radius:10px;padding:8px 14px;margin:4px;font-size:13px}
+.stat b{color:var(--gold2);font-size:18px;font-family:Syne}
+.unit{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:13px;display:flex;gap:8px;align-items:center}
+.unit .u{flex:1}
+.tag{font-size:9px;background:#26210f;color:var(--gold2);border-radius:8px;padding:1px 6px}
+.tag.rv{background:#0f2a20;color:var(--acc)}
+a{color:var(--acc)}
+.hidden{display:none}
+.audit{font-size:11.5px;color:var(--dim);font-family:monospace;border-top:1px solid var(--line);padding-top:8px;margin-top:10px}
+.ok{color:var(--acc);font-weight:700}.err{color:#f87171;font-weight:700}
+</style>
+</head>
+<body>
+<h1>⚙️ Admin Maestro Vokasi</h1>
+<div class="sub">Panel pengelola kurikulum & statistik — Dharma Labs Digital</div>
+
+<div id="login" class="card">
+  <label>PIN Superadmin</label>
+  <input id="pin" type="password" maxlength="6" inputmode="numeric">
+  <button class="btn" onclick="login()">Masuk</button>
+  <div id="loginMsg" style="margin-top:8px;font-size:13px"></div>
+</div>
+
+<div id="panel" class="hidden">
+  <div class="card">
+    <b>Statistik</b><br><span id="stats"></span>
+    <div class="audit" id="audit"></div>
+  </div>
+
+  <div class="card">
+    <b>➕ Tambah / Ubah Materi</b>
+    <div class="row">
+      <div><label>ID unit</label><input id="uId" placeholder="k5-mat-2"></div>
+      <div><label>Kelas (1–9)</label><input id="uKelas" type="number" min="1" max="9"></div>
+    </div>
+    <div class="row">
+      <div><label>Mapel</label><input id="uMapel" placeholder="Matematika"></div>
+      <div><label>Semester</label><input id="uSem" type="number" min="1" max="2" value="1"></div>
+    </div>
+    <label>Judul</label><input id="uJudul">
+    <label>Materi (HTML sederhana)</label><textarea id="uMateri"></textarea>
+    <label>Soal — format JSON array: [{"q":"soal","o":["a","b","c","d"],"a":1,"p":"pembahasan"}]</label>
+    <textarea id="uSoal" placeholder='[{"q":"1+1=?","o":["1","2","3","4"],"a":1,"p":"penjumlahan dasar"}]'></textarea>
+    <label>Status</label>
+    <select id="uStatus"><option value="demo">DEMO (belum tervalidasi)</option><option value="final">Tinjau (reviewed)</option></select>
+    <button class="btn" onclick="saveUnit()">💾 Simpan ke Server</button>
+    <div id="saveMsg" style="margin-top:8px;font-size:13px"></div>
+  </div>
+
+  <div class="card">
+    <b>📚 Daftar Materi (dari server)</b>
+    <button class="btn alt" onclick="loadList()" style="margin-top:8px">Muat / Segarkan</button>
+    <div id="unitList" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <button class="btn red" onclick="logout()">Keluar</button>
+  </div>
+</div>
+
+<script>
+const MV = { url: 'https://whtsromktkymksuvagrw.supabase.co/rest/v1/rpc/', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndodHNyb21rdGt5bWtzdXZhZ3J3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzNTMzMTIsImV4cCI6MjEwNjkyOTMxMn0.Ey3dgYFJP0rI57eBkNtFgJjl_Qf-KI0H7dpfD_t4Kos', app: 'mv-DJOrpw5N0iMIELtz' };
+let PIN = '';
+const $ = id => document.getElementById(id);
+function rpc(fn, body) {
+  return fetch(MV.url + fn, { method: 'POST',
+    headers: { 'apikey': MV.key, 'Authorization': 'Bearer ' + MV.key, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body) })
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+}
+async function login() {
+  PIN = $('pin').value.trim();
+  const d = await rpc('mv_stats', { p_pin: PIN }).catch(() => null);
+  if (d && d.users !== undefined) {
+    $('login').classList.add('hidden'); $('panel').classList.remove('hidden');
+    $('stats').innerHTML =
+      `<span class="stat">Pengguna <b>${d.users}</b></span>` +
+      `<span class="stat">Progres <b>${d.progress}</b></span>` +
+      `<span class="stat">Materi <b>${d.units}</b></span>` +
+      `<span class="stat">Sertifikat <b>${d.certs}</b></span>`;
+    $('audit').innerHTML = '<b style="color:var(--txt)">Audit terbaru:</b><br>' +
+      (d.audit || []).map(a => `${new Date(a.at).toLocaleString('id-ID')} · ${a.actor} · ${a.action} · ${a.detail}`).join('<br>');
+    loadList();
+  } else {
+    $('loginMsg').innerHTML = '<span class="err">✕ PIN salah atau server tidak terjangkau.</span>';
+  }
+}
+function fill(u) {
+  $('uId').value = u.id; $('uKelas').value = u.kelas; $('uMapel').value = u.mapel;
+  $('uSem').value = u.semester || 1; $('uJudul').value = u.judul;
+  $('uMateri').value = u.materi || ''; $('uSoal').value = JSON.stringify(u.soal || [], null, 1);
+  $('uStatus').value = u.reviewed ? 'final' : 'demo';
+  window.scrollTo(0, 0);
+}
+async function saveUnit() {
+  let soal;
+  try { soal = JSON.parse($('uSoal').value || '[]'); }
+  catch (e) { $('saveMsg').innerHTML = '<span class="err">✕ Format soal bukan JSON valid.</span>'; return; }
+  const unit = {
+    id: $('uId').value.trim(), kelas: parseInt($('uKelas').value), semester: parseInt($('uSem').value),
+    mapel: $('uMapel').value.trim(), judul: $('uJudul').value.trim(),
+    materi: $('uMateri').value, soal: soal,
+    status: $('uStatus').value === 'final' ? 'final' : 'demo',
+    reviewed: $('uStatus').value === 'final'
+  };
+  if (!unit.id || !unit.mapel || !(unit.kelas >= 1 && unit.kelas <= 9)) {
+    $('saveMsg').innerHTML = '<span class="err">✕ ID, mapel wajib; kelas 1–9.</span>'; return;
+  }
+  const r = await rpc('mv_kur_save', { p_pin: PIN, p_units: [unit] }).catch(() => null);
+  if (r && r.ok) { $('saveMsg').innerHTML = '<span class="ok">✓ ' + r.saved + ' materi tersimpan di server.</span>'; loadList(); }
+  else $('saveMsg').innerHTML = '<span class="err">✕ Gagal: ' + (r && r.msg || 'server') + '</span>';
+}
+async function loadList() {
+  const d = await rpc('mv_kur_get', { p_app: MV.app }).catch(() => null);
+  if (!d) { $('unitList').textContent = 'Gagal memuat.'; return; }
+  $('unitList').innerHTML = d.map(u =>
+    `<div class="unit"><div class="u"><b>${u.judul || u.id}</b> ` +
+    (u.reviewed ? '<span class="tag rv">REVIEWED</span>' : '<span class="tag">DEMO</span>') +
+    `<br><small style="color:var(--dim)">K${u.kelas} · ${u.mapel} · ${u.soal ? u.soal.length : 0} soal</small></div>` +
+    `<button class="btn alt" style="width:auto;padding:6px 10px;margin:0" onclick='fill(${JSON.stringify(u).replace(/'/g, "&#39;")})'>Ubah</button></div>`).join('');
+}
+function logout() { PIN = ''; location.reload(); }
+</script>
+</body>
+</html>

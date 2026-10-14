@@ -73,6 +73,13 @@ nav button{flex:1;background:none;border:none;color:var(--dim);padding:11px 4px 
 nav button.on{color:var(--gold2)}
 nav button .ni{display:block;font-size:19px}
 .small{font-size:12px;color:var(--dim);text-align:center;margin-top:10px}
+.kelas{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 6px;text-align:center;cursor:pointer}
+.kelas b{font-size:17px;font-family:Syne}
+.kelas small{display:block;color:var(--dim);font-size:10px;margin-top:3px}
+.kelas:active{transform:scale(.95)}
+.badge-demo{font-size:9px;background:#26210f;color:var(--gold2);border-radius:8px;padding:1px 6px;margin-left:4px}
+.rrow{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px;font-size:13px}
+.rrow b{float:right}
 </style>
 </head>
 <body>
@@ -142,6 +149,44 @@ nav button .ni{display:block;font-size:19px}
 </div>
 </div>
 
+<div class="page" id="p-kur">
+  <button class="back" onclick="go('home')">‹ Beranda</button>
+  <h2 class="sec">📚 Kurikulum Kelas 1–9</h2>
+  <p class="desc" id="kurStatus">Fase A (kelas 1–2) · B (3–4) · C (5–6) · D (7–9). Materi bertanda DEMO masih uji coba dan belum tervalidasi resmi.</p>
+  <div class="grid" id="kelasGrid"></div>
+</div>
+<div class="page" id="p-mapel">
+  <button class="back" onclick="go('kur')">‹ Pilih kelas</button>
+  <h2 class="sec" id="mapelTitle"></h2>
+  <p class="desc">Pilih mata pelajaran.</p>
+  <div id="mapelList"></div>
+</div>
+<div class="page" id="p-units">
+  <button class="back" onclick="go('mapel')">‹ Pilih mapel</button>
+  <h2 class="sec" id="unitTitle"></h2>
+  <p class="desc" id="unitDesc"></p>
+  <div id="unitList"></div>
+</div>
+<div class="page" id="p-kurlearn">
+  <button class="back" onclick="go('units')">‹ Daftar materi</button>
+  <div class="materi" id="kurMateri"></div>
+  <div class="quiz" id="kurQuiz"></div>
+  <button class="btn" id="kurSubmit" onclick="submitKur()">Kirim Jawaban</button>
+  <div id="kurScore"></div>
+</div>
+<div class="page" id="p-rapor">
+  <button class="back" onclick="go('home')">‹ Beranda</button>
+  <h2 class="sec">📊 Rapor Kemajuan</h2>
+  <p class="desc" id="raporStatus"></p>
+  <div id="raporBody"></div>
+  <div style="margin-top:16px"><button class="btn alt" onclick="openPlace()">🧭 Tes Pemetaan Kemampuan</button></div>
+</div>
+<div class="page" id="p-place">
+  <button class="back" onclick="go('rapor')">‹ Rapor</button>
+  <h2 class="sec">🧭 Tes Pemetaan</h2>
+  <p class="desc">9 soal singkat untuk menyarankan kelas awal yang cocok. Tidak memengaruhi progres belajarmu.</p>
+  <div id="placeBody"></div>
+</div>
 <div class="page" id="p-verify">
   <h2 class="sec">🔎 Verifikasi Sertifikat</h2>
   <p class="desc">Masukkan kode verifikasi untuk mengecek keaslian sertifikat Dharma Labs.</p>
@@ -151,7 +196,9 @@ nav button .ni{display:block;font-size:19px}
 </div>
 
 <nav>
-  <button id="nv-home" class="on" onclick="go('home')"><span class="ni">🏠</span>Beranda</button>
+  <button id="nv-home" class="on" onclick="go('home')"><span class="ni">🏠</span>Belajar</button>
+  <button id="nv-kur" onclick="go('kur')"><span class="ni">📚</span>Kurikulum</button>
+  <button id="nv-rapor" onclick="go('rapor')"><span class="ni">📊</span>Rapor</button>
   <button id="nv-cert" onclick="go('cert')"><span class="ni">🎓</span>Sertifikat</button>
   <button id="nv-verify" onclick="go('verify')"><span class="ni">🔎</span>Verifikasi</button>
 </nav>
@@ -463,8 +510,143 @@ function verifyCert() {
       box.innerHTML = '<div class="materi"><p>✕ Gagal terhubung. Periksa koneksi internet lalu coba lagi.</p></div>';
     });
 }
+
+// ================== KURIKULUM 1-9 ==================
+let KUR=null, curKelas=null, curMapel=null, kurAns={};
+function loadKur(){
+  $('kurStatus').textContent='⏳ Memuat kurikulum…';
+  mvRpc('mv_kur_get',{p_app:MV.app}).then(function(d){
+    if(d&&d.length){KUR=d;try{localStorage.setItem('mv_kur_cache',JSON.stringify({ts:Date.now(),units:d}))}catch(e){}
+      $('kurStatus').textContent='Fase A (kelas 1–2) · B (3–4) · C (5–6) · D (7–9). Materi DEMO belum tervalidasi resmi. ✓ tersinkron';
+      renderKelas();renderRapor();}
+  }).catch(function(){
+    try{KUR=JSON.parse(localStorage.getItem('mv_kur_cache')||'{}').units}catch(e){}
+    if(KUR){$('kurStatus').textContent='📴 Offline — pakai kurikulum tersimpan di perangkat ('+KUR.length+' unit).';
+      renderKelas();renderRapor();}
+    else{$('kurStatus').textContent='✕ Gagal memuat kurikulum dan belum ada cache offline. Periksa koneksi lalu buka ulang.'}
+  });
+}
+const fase=k=>k<=2?'Fase A':(k<=4?'Fase B':(k<=6?'Fase C':'Fase D'));
+function renderKelas(){
+  let h='';
+  for(let k=1;k<=9;k++){
+    const us=KUR.filter(u=>u.kelas===k);
+    const dn=us.filter(u=>S.done[u.id]&&S.done[u.id].score>=70).length;
+    h+='<div class="kelas" onclick="openKelas('+k+')"><b>Kelas '+k+'</b><small>'+fase(k)+' · '+dn+'/'+us.length+' selesai</small></div>';
+  }
+  $('kelasGrid').innerHTML=h;
+}
+function openKelas(k){curKelas=k;
+  $('mapelTitle').textContent='Kelas '+k+' · '+fase(k);
+  const mapels=[...new Set(KUR.filter(u=>u.kelas===k).map(u=>u.mapel))];
+  let h='';
+  mapels.forEach(m=>{
+    const us=KUR.filter(u=>u.kelas===k&&u.mapel===m);
+    const dn=us.filter(u=>S.done[u.id]&&S.done[u.id].score>=70).length;
+    h+='<div class="mod" onclick="openMapel(\''+m+'\')"><div class="mi">📘</div><div class="mb"><h4>'+m+'</h4><p>'+us.length+' materi · '+dn+' lulus</p></div><span class="stat st-try">'+dn+'/'+us.length+'</span></div>';
+  });
+  $('mapelList').innerHTML=h;go('mapel');
+}
+function openMapel(m){curMapel=m;
+  const us=KUR.filter(u=>u.kelas===curKelas&&u.mapel===m);
+  $('unitTitle').textContent=m+' · Kelas '+curKelas;
+  $('unitDesc').textContent=us.length+' materi. Kuis lulus ≥70.';
+  let h='';
+  us.forEach(u=>{
+    const d=S.done[u.id];
+    const st=d?(d.score>=70?'<span class="stat st-pass">✓ '+d.score+'</span>':'<span class="stat st-try">⟳ '+d.score+'</span>'):'';
+    const bd=u.status==='demo'?'<span class="badge-demo">DEMO</span>':'';
+    const ko=(u.materi&&u.soal.length)?'':' <small style="color:var(--dim)">(materi belum tersedia)</small>';
+    h+='<div class="mod" onclick="openUnit(\''+u.id+'\')"><div class="mi">📄</div><div class="mb"><h4>'+u.judul+bd+'</h4>'+ko+'</div>'+st+'</div>';
+  });
+  $('unitList').innerHTML=h;go('units');
+}
+function openUnit(id){
+  const u=KUR.find(x=>x.id===id);if(!u)return;
+  if(!u.materi||!u.soal.length){alert('Materi unit ini belum tersedia — akan ditambahkan melalui panel admin.');return}
+  kurAns={};
+  $('kurMateri').innerHTML='<h3>'+u.judul+'</h3>'+(u.status==='demo'?'<p style="font-size:11px;color:var(--gold2)">⚠️ Materi demonstrasi — belum tervalidasi resmi.</p>':'')+u.materi;
+  let h='';
+  u.soal.forEach((q,qi)=>{
+    h+='<div class="q"><h4>'+(qi+1)+'. '+q.q+'</h4>';
+    q.o.forEach((o,oi)=>{h+='<button class="opt" id="ko'+qi+'_'+oi+'" onclick="kurPick('+qi+','+oi+')">'+String.fromCharCode(65+oi)+'. '+o+'</button>'});
+    h+='</div>';
+  });
+  $('kurQuiz').innerHTML=h;$('kurScore').innerHTML='';$('kurSubmit').disabled=false;
+  curUnit=u;go('kurlearn');
+}
+let curUnit=null;
+function kurPick(qi,oi){kurAns[qi]=oi;
+  for(let j=0;j<4;j++){const e=$('ko'+qi+'_'+j);if(e)e.classList.remove('sel')}
+  $('ko'+qi+'_'+oi).classList.add('sel');}
+function submitKur(){
+  const u=curUnit,n=u.soal.length;
+  if(Object.keys(kurAns).length<n){alert('Jawab semua '+n+' soal dulu.');return}
+  let c=0,remedial=[];
+  u.soal.forEach((q,qi)=>{
+    const ok=kurAns[qi]===q.a;if(ok)c++;
+    else remedial.push({i:qi+1,benar:String.fromCharCode(65+q.a)+'. '+q.o[q.a],pembahasan:q.p||'—'});
+  });
+  const sc=Math.round(c/n*100),pass=sc>=70;
+  S.done[u.id]={score:sc,date:new Date().toISOString().slice(0,10)};save();
+  if(pass)pushSync();else pushSync(); // progress selalu tersinkron
+  let h='<div class="score"><div class="big" style="color:'+(pass?'#00d4aa':'#f5c518')+'">'+sc+'</div><div>'+(pass?'✅ LULUS':'⟳ Remedial diperlukan')+'</div>';
+  if(remedial.length){h+='<div class="materi" style="margin-top:12px;text-align:left"><h3 style="color:var(--gold2)">Pembahasan soal yang keliru</h3>';
+    remedial.forEach(r=>{h+='<p><b>Soal '+r.i+'</b> — jawaban benar: <b>'+r.benar+'</b><br>Pembahasan: '+r.pembahasan+'</p>'});
+    h+='</div><p style="font-size:12px;color:var(--dim)">Rekomendasi: pelajari ulang materi di atas, lalu ulangi kuis. Tidak ada batas percobaan.</p>';}
+  else{h+='<div class="materi" style="margin-top:12px;text-align:left"><h3>🎉 Semua benar!</h3><p>Rekomendasi: lanjut ke materi berikutnya di mata pelajaran ini.</p></div>'}
+  h+='<div style="margin-top:10px"><button class="btn alt" onclick="go(\'units\')">‹ Daftar materi</button></div></div>';
+  $('kurScore').innerHTML=h;$('kurSubmit').disabled=true;
+  renderKelas();renderRapor();
+}
+// ================== RAPOR ==================
+function renderRapor(){
+  if(!KUR)return;
+  let tot=0,dn=0,h='';
+  for(let k=1;k<=9;k++){
+    const us=KUR.filter(u=>u.kelas===k);
+    if(!us.length)continue;
+    const kdn=us.filter(u=>S.done[u.id]&&S.done[u.id].score>=70).length;
+    tot+=us.length;dn+=kdn;
+    h+='<div class="rrow">Kelas '+k+' <b>'+kdn+'/'+us.length+'</b></div>';
+  }
+  $('raporStatus').textContent='Progres tersimpan otomatis di perangkat dan disinkronkan ke server saat online.';
+  $('raporBody').innerHTML=h+'<div class="rrow" style="border-color:var(--gold)">TOTAL KURIKULUM 1–9 <b>'+dn+'/'+tot+'</b></div>';
+}
+// ================== TES PEMETAAN ==================
+const PLACE=[
+ {k:1,q:'3 + 2 = …',o:['4','5','6','7'],a:1},
+ {k:2,q:'24 + 15 = …',o:['29','39','49','35'],a:1},
+ {k:3,q:'4 × 3 = …',o:['7','10','12','14'],a:2},
+ {k:4,q:'1/2 + 1/4 = …',o:['3/4','2/6','1/6','1/8'],a:0},
+ {k:5,q:'0,25 = …',o:['1/2','1/4','3/4','1/5'],a:1},
+ {k:6,q:'Volume balok 5×4×3 = …',o:['12','60','20','15'],a:1},
+ {k:7,q:'Jika 2x + 5 = 15, x = …',o:['3','5','7','10'],a:1},
+ {k:8,q:'Sisi miring segitiga sisi 3 dan 4 adalah…',o:['5','6','7','12'],a:0},
+ {k:9,q:'Rata-rata dari 7, 8, 6, 9 adalah…',o:['7','8','7,5','9'],a:2}];
+let placeI=0,placeC=0;
+function openPlace(){placeI=0;placeC=0;renderPlace();go('place');}
+function renderPlace(){
+  if(placeI>=PLACE.length){
+    let rekom=1;for(let i=0;i<PLACE.length;i++){if(placeC[i+1])rekom=Math.max(rekom,PLACE[i].k)}
+    let lvl=1;for(let i=0;i<PLACE.length;i++){if(placeC.indexOf(i+1)===-1)break;lvl=PLACE[i].k}
+    $('placeBody').innerHTML='<div class="score"><div class="big">Kelas '+rekom+'</div><div>Rekomendasi titik awal belajarmu berdasarkan jawaban benar berurutan.</div><div style="margin-top:12px"><button class="btn" onclick="openKelas('+rekom+')">Mulai Belajar Kelas '+rekom+'</button></div></div>';
+    return;
+  }
+  const p=PLACE[placeI];
+  let h='<div class="q"><h4>Soal '+p.k+' — '+p.q+'</h4>';
+  p.o.forEach((o,oi)=>{h+='<button class="opt" onclick="placePick('+oi+')">'+String.fromCharCode(65+oi)+'. '+o+'</button>'});
+  h+='</div>';
+  $('placeBody').innerHTML=h;
+}
+function placePick(oi){
+  if(oi===PLACE[placeI].a)placeC.push(PLACE[placeI].k);
+  placeI++;renderPlace();
+}
+// ================== START ==================
 renderHome();
 pullSync();
+loadKur();
 </script>
 </body>
 </html>
