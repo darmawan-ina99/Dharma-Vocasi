@@ -566,7 +566,7 @@ function loadKur(){
 }
 function say(t,l){try{const u=new SpeechSynthesisUtterance(t);u.lang=l;u.rate=.85;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
 function favToggle(id){if(!S.fav)S.fav={};if(S.fav[id])delete S.fav[id];else S.fav[id]=1;save();renderHome();if(curList)showUnits(curList,curTitle,curDesc)}
-function langUnitMatches(u,L){var hay=String(u&&u.mapel||'').toLowerCase();return u&&u.track==='lang'&&(L.keys||[L.nm]).some(function(k){return hay.indexOf(String(k).toLowerCase())>=0})}
+function langUnitMatches(u,L){var hay=String(u&&u.mapel||'').toLowerCase();var byId=u&&String(u.id||'').indexOf('lang-'+L.id+'-')===0;var byLabel=u&&u.track==='lang'&&(L.keys||[L.nm]).some(function(k){return hay.indexOf(String(k).toLowerCase())>=0});return !!(byId||byLabel)}
 let curList=null,curTitle='',curDesc='';
 function unitRow(u){
   const d=S.done[u.id];
