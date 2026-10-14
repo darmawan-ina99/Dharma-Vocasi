@@ -56,6 +56,15 @@ a{color:var(--acc)}
       <div><label>Kelas (1–9)</label><input id="uKelas" type="number" min="1" max="9"></div>
     </div>
     <div class="row">
+      <div><label>Jalur (track)</label><select id="uTrack">
+        <option value="sd">sd (Sekolah 1-6)</option><option value="smp">smp (7-9)</option>
+        <option value="sma">sma (10-12)</option><option value="smk">smk (10-12)</option>
+        <option value="lang">lang (Akademi Bahasa)</option>
+        <option value="ai">ai (Akademi AI)</option><option value="voc">voc (Vokasi)</option>
+      </select></div>
+      <div><label>Level (A1/N5/HSK1/cyber/0-6)</label><input id="uLevel" placeholder="A1"></div>
+    </div>
+    <div class="row">
       <div><label>Mapel</label><input id="uMapel" placeholder="Matematika"></div>
       <div><label>Semester</label><input id="uSem" type="number" min="1" max="2" value="1"></div>
     </div>
@@ -108,7 +117,8 @@ async function login() {
   }
 }
 function fill(u) {
-  $('uId').value = u.id; $('uKelas').value = u.kelas; $('uMapel').value = u.mapel;
+  $('uId').value = u.id; $('uKelas').value = u.kelas || 0; $('uMapel').value = u.mapel;
+  $('uTrack').value = u.track || 'sd'; $('uLevel').value = u.level || '';
   $('uSem').value = u.semester || 1; $('uJudul').value = u.judul;
   $('uMateri').value = u.materi || ''; $('uSoal').value = JSON.stringify(u.soal || [], null, 1);
   $('uStatus').value = u.reviewed ? 'final' : 'demo';
@@ -119,14 +129,15 @@ async function saveUnit() {
   try { soal = JSON.parse($('uSoal').value || '[]'); }
   catch (e) { $('saveMsg').innerHTML = '<span class="err">✕ Format soal bukan JSON valid.</span>'; return; }
   const unit = {
-    id: $('uId').value.trim(), kelas: parseInt($('uKelas').value), semester: parseInt($('uSem').value),
+    id: $('uId').value.trim(), track: $('uTrack').value, level: $('uLevel').value.trim(),
+    kelas: (isNaN(parseInt($('uKelas').value)) ? 0 : parseInt($('uKelas').value)), semester: parseInt($('uSem').value),
     mapel: $('uMapel').value.trim(), judul: $('uJudul').value.trim(),
     materi: $('uMateri').value, soal: soal,
     status: $('uStatus').value === 'final' ? 'final' : 'demo',
     reviewed: $('uStatus').value === 'final'
   };
-  if (!unit.id || !unit.mapel || !(unit.kelas >= 1 && unit.kelas <= 9)) {
-    $('saveMsg').innerHTML = '<span class="err">✕ ID, mapel wajib; kelas 1–9.</span>'; return;
+  if (!unit.id || !unit.mapel) {
+    $('saveMsg').innerHTML = '<span class="err">✕ ID dan mapel wajib.</span>'; return;
   }
   const r = await rpc('mv_kur_save', { p_pin: PIN, p_units: [unit] }).catch(() => null);
   if (r && r.ok) { $('saveMsg').innerHTML = '<span class="ok">✓ ' + r.saved + ' materi tersimpan di server.</span>'; loadList(); }
@@ -138,7 +149,7 @@ async function loadList() {
   $('unitList').innerHTML = d.map(u =>
     `<div class="unit"><div class="u"><b>${u.judul || u.id}</b> ` +
     (u.reviewed ? '<span class="tag rv">REVIEWED</span>' : '<span class="tag">DEMO</span>') +
-    `<br><small style="color:var(--dim)">K${u.kelas} · ${u.mapel} · ${u.soal ? u.soal.length : 0} soal</small></div>` +
+    `<br><small style="color:var(--dim)">${u.track || 'sd'} · K${u.kelas} ${u.level ? '· ' + u.level : ''} · ${u.mapel} · ${u.soal ? u.soal.length : 0} soal</small></div>` +
     `<button class="btn alt" style="width:auto;padding:6px 10px;margin:0" onclick='fill(${JSON.stringify(u).replace(/'/g, "&#39;")})'>Ubah</button></div>`).join('');
 }
 function logout() { PIN = ''; location.reload(); }
