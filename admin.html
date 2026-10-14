@@ -90,6 +90,7 @@ a{color:var(--acc)}
 </div>
 
 <script>
+function E(v){return String(v==null?'':v).replace(/[&<>"'`]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c]})}
 const MV = { url: 'https://whtsromktkymksuvagrw.supabase.co/rest/v1/rpc/', key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndodHNyb21rdGt5bWtzdXZhZ3J3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzNTMzMTIsImV4cCI6MjEwNjkyOTMxMn0.Ey3dgYFJP0rI57eBkNtFgJjl_Qf-KI0H7dpfD_t4Kos', app: 'mv-DJOrpw5N0iMIELtz' };
 let PIN = '';
 const $ = id => document.getElementById(id);
@@ -105,12 +106,12 @@ async function login() {
   if (d && d.users !== undefined) {
     $('login').classList.add('hidden'); $('panel').classList.remove('hidden');
     $('stats').innerHTML =
-      `<span class="stat">Pengguna <b>${d.users}</b></span>` +
-      `<span class="stat">Progres <b>${d.progress}</b></span>` +
-      `<span class="stat">Materi <b>${d.units}</b></span>` +
-      `<span class="stat">Sertifikat <b>${d.certs}</b></span>`;
+      `<span class="stat">Pengguna <b>${+d.users||0}</b></span>` +
+      `<span class="stat">Progres <b>${+d.progress||0}</b></span>` +
+      `<span class="stat">Materi <b>${+d.units||0}</b></span>` +
+      `<span class="stat">Sertifikat <b>${+d.certs||0}</b></span>`;
     $('audit').innerHTML = '<b style="color:var(--txt)">Audit terbaru:</b><br>' +
-      (d.audit || []).map(a => `${new Date(a.at).toLocaleString('id-ID')} · ${a.actor} · ${a.action} · ${a.detail}`).join('<br>');
+      (d.audit || []).map(a => `${E(new Date(a.at).toLocaleString('id-ID'))} · ${E(a.actor)} · ${E(a.action)} · ${E(a.detail)}`).join('<br>');
     loadList();
   } else {
     $('loginMsg').innerHTML = '<span class="err">✕ PIN salah atau server tidak terjangkau.</span>';
@@ -140,18 +141,24 @@ async function saveUnit() {
     $('saveMsg').innerHTML = '<span class="err">✕ ID dan mapel wajib.</span>'; return;
   }
   const r = await rpc('mv_kur_save', { p_pin: PIN, p_units: [unit] }).catch(() => null);
-  if (r && r.ok) { $('saveMsg').innerHTML = '<span class="ok">✓ ' + r.saved + ' materi tersimpan di server.</span>'; loadList(); }
-  else $('saveMsg').innerHTML = '<span class="err">✕ Gagal: ' + (r && r.msg || 'server') + '</span>';
+  if (r && r.ok) { $('saveMsg').innerHTML = '<span class="ok">✓ ' + (+r.saved||0) + ' materi tersimpan di server.</span>'; loadList(); }
+  else $('saveMsg').innerHTML = '<span class="err">✕ Gagal: ' + E(r && r.msg || 'server') + '</span>';
 }
 async function loadList() {
   const d = await rpc('mv_kur_get', { p_app: MV.app }).catch(() => null);
   if (!d) { $('unitList').textContent = 'Gagal memuat.'; return; }
-  $('unitList').innerHTML = d.map(u =>
-    `<div class="unit"><div class="u"><b>${u.judul || u.id}</b> ` +
+  if (!Array.isArray(d)) { $('unitList').textContent = 'Data tidak valid.'; return; }
+  window._units = d;
+  $('unitList').innerHTML = d.map((u, i) =>
+    `<div class="unit"><div class="u"><b>${E(u.judul || u.id)}</b> ` +
     (u.reviewed ? '<span class="tag rv">REVIEWED</span>' : '<span class="tag">DEMO</span>') +
-    `<br><small style="color:var(--dim)">${u.track || 'sd'} · K${u.kelas} ${u.level ? '· ' + u.level : ''} · ${u.mapel} · ${u.soal ? u.soal.length : 0} soal</small></div>` +
-    `<button class="btn alt" style="width:auto;padding:6px 10px;margin:0" onclick='fill(${JSON.stringify(u).replace(/'/g, "&#39;")})'>Ubah</button></div>`).join('');
+    `<br><small style="color:var(--dim)">${E(u.track || 'sd')} · K${E(u.kelas)} ${u.level ? '· ' + E(u.level) : ''} · ${E(u.mapel)} · ${u.soal ? (+u.soal.length||0) : 0} soal</small></div>` +
+    `<button class="btn alt" style="width:auto;padding:6px 10px;margin:0" data-edit="${i}">Ubah</button></div>`).join('');
 }
+document.addEventListener('click', function (ev) {
+  var t = ev.target.closest ? ev.target.closest('[data-edit]') : null;
+  if (t && window._units) fill(window._units[+t.getAttribute('data-edit')]);
+});
 function logout() { PIN = ''; location.reload(); }
 </script>
 </body>

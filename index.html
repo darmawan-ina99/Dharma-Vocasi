@@ -204,6 +204,7 @@ nav button .ni{display:block;font-size:19px}
   <button id="nv-verify" onclick="go('verify')"><span class="ni">🔎</span>Verifikasi</button>
 </nav>
 
+<script src="purify.min.js" integrity="sha384-P0JNneQf81HOl9VwNXK76cQ9VMD6Nfsnepxb0cCOg8+UzEdzgPHAPV4wVQrvYQSx"></script>
 <script>
 "use strict";
 // ================== KURIKULUM ==================
@@ -314,6 +315,18 @@ const PROG = {
   ]}
 };
 const PASS = 70; // nilai minimal tiap kuis (%)
+/* ===== KEAMANAN: sanitasi konten tidak tepercaya (patch XSS) ===== */
+// Teks biasa -> selalu aman (dipakai untuk string yang ditempel ke template HTML).
+function E(v){return String(v==null?'':v).replace(/[&<>"'`]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c]})}
+// Materi berformat HTML -> allowlist ketat via DOMPurify. Bila DOMPurify gagal dimuat: fallback ke teks polos (fail-closed).
+var _PURIFY_CFG={ALLOWED_TAGS:['h3','h4','p','b','i','u','em','strong','br','ul','ol','li','small','span','div','table','thead','tbody','tr','th','td','blockquote','code','pre','sub','sup','hr'],
+  ALLOWED_ATTR:['class'],ALLOW_DATA_ATTR:false,ALLOW_ARIA_ATTR:false,FORBID_TAGS:['style','script','iframe','object','embed','form','input','img','svg','math','link','meta','base'],FORBID_ATTR:['style','onerror','onload','onclick']};
+function cleanHTML(h){
+  h=String(h==null?'':h);
+  if(window.DOMPurify&&DOMPurify.isSupported)return DOMPurify.sanitize(h,_PURIFY_CFG);
+  var d=document.createElement('div');d.textContent=h;return d.innerHTML; // fail-closed
+}
+
 // ================== CLOUD SYNC (Supabase — Dharma Labs) ==================
 const MV = {
   url: 'https://whtsromktkymksuvagrw.supabase.co/rest/v1/rpc/',
@@ -407,7 +420,7 @@ function openProg(k){
 }
 function openMod(i){
   curMod=PROG[curProg].mods[i];answers={};
-  $('materiBox').innerHTML=curMod.materi;
+  $('materiBox').innerHTML=cleanHTML(curMod.materi);
   let h='';
   curMod.quiz.forEach((q,qi)=>{
     h+=`<div class="q"><h4>${qi+1}. ${q.q}</h4>`;
@@ -478,7 +491,7 @@ function makeCert(){
   for(let i=0;i<src.length;i++){h1=((h1<<5)-h1+src.charCodeAt(i))|0}
   const kode='DL-MV-'+Math.abs(h1).toString(36).toUpperCase().slice(0,8);
   $('crtNama').textContent=name;
-  $('crtBody').innerHTML=`telah menyelesaikan program pembelajaran jarak jauh<br><b>${p.name}</b> (${p.mods.length} modul)${city?'<br>Asal: '+city:''}<br>dengan capaian kuis memuaskan pada Maestro Vokasi.`;
+  $('crtBody').innerHTML=`telah menyelesaikan program pembelajaran jarak jauh<br><b>${p.name}</b> (${p.mods.length} modul)${city?'<br>Asal: '+E(city):''}<br>dengan capaian kuis memuaskan pada Maestro Vokasi.`;
   $('certForm').querySelector('.foot');
   const foot=$('certArea');
   $('certForm').style.display='none';
@@ -505,7 +518,7 @@ function verifyCert() {
     .then(function (d) {
       if (d && d.ok) {
         var pn = { sd: 'Paket Dasar SD', smp: 'Paket Dasar SMP', sma: 'Paket Dasar SMA', skill: 'Kelas Skill' };
-        box.innerHTML = '<div class="materi" style="border-color:#00d4aa"><h3 style="color:#00d4aa">✅ SERTIFIKAT SAH</h3><p><b>' + (d.name || '-') + '</b>' + (d.city ? ' — ' + d.city : '') + '</p><p>Program: <b>' + (pn[d.program] || d.program) + '</b></p><p>Diterbitkan: ' + new Date(d.issued_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) + '</p></div>';
+        box.innerHTML = '<div class="materi" style="border-color:#00d4aa"><h3 style="color:#00d4aa">✅ SERTIFIKAT SAH</h3><p><b>' + E(d.name || '-') + '</b>' + (d.city ? ' — ' + E(d.city) : '') + '</p><p>Program: <b>' + E(pn[d.program] || d.program) + '</b></p><p>Diterbitkan: ' + new Date(d.issued_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) + '</p></div>';
       } else {
         box.innerHTML = '<div class="materi" style="border-color:#f87171"><h3 style="color:#f87171">✕ TIDAK DITEMUKAN</h3><p>Kode tidak terdaftar. Periksa penulisan kode atau hubungi 0851-5116-4342.</p></div>';
       }
@@ -537,7 +550,7 @@ const VOCS=[
  {id:'cyber',nm:'Cybersecurity Dasar'},{id:'usaha',nm:'Kewirausahaan'}];
 function loadKur(){
   mvRpc('mv_kur_get',{p_app:MV.app}).then(function(d){
-    if(d&&d.length){KUR=d;try{localStorage.setItem('mv_kur_cache',JSON.stringify({ts:Date.now(),units:d}))}catch(e){}
+    if(Array.isArray(d)&&d.length){KUR=d.filter(function(u){return u&&typeof u==='object'&&typeof u.id==='string'});try{localStorage.setItem('mv_kur_cache',JSON.stringify({ts:Date.now(),units:d}))}catch(e){}
       renderCatalog();renderRapor();}
   }).catch(function(){
     try{KUR=JSON.parse(localStorage.getItem('mv_kur_cache')||'{}').units}catch(e){}
@@ -549,12 +562,12 @@ function favToggle(id){if(!S.fav)S.fav={};if(S.fav[id])delete S.fav[id];else S.f
 let curList=null,curTitle='',curDesc='';
 function unitRow(u){
   const d=S.done[u.id];
-  const st=d?(d.score>=70?'<span class="stat st-pass">✓ '+d.score+'</span>':'<span class="stat st-try">⟳ '+d.score+'</span>'):'';
+  const st=d?(d.score>=70?'<span class="stat st-pass">✓ '+(+d.score||0)+'</span>':'<span class="stat st-try">⟳ '+(+d.score||0)+'</span>'):'';
   const bd=u.status==='demo'?' <span class="badge-demo">DEMO</span>':(u.status==='draft'?' <span class="badge-demo" style="background:#1e2a38;color:#7ec8ff">DRAFT</span>':'');
   const belum=(u.status==='struktur'||!u.materi||!u.soal||!u.soal.length)?' <small style="color:var(--dim)">(materi belum tersedia)</small>':'';
   const fv=(S.fav&&S.fav[u.id])?'★':'☆';
-  const sek=(u.track==='sd'||u.track==='smp'||u.track==='sma'||u.track==='smk')?('Kelas '+u.kelas+' · '):((u.level||'')!==''?u.level+' · ':'');
-  return '<div class="mod"><div class="mi">📄</div><div class="mb" style="cursor:pointer" onclick="openUnit(\''+u.id+'\')"><h4>'+u.judul+bd+belum+'</h4><p>'+sek+u.mapel+'</p></div><button class="opt" style="width:auto;padding:6px 10px;margin:0;flex:none" onclick="favToggle(\''+u.id+'\')">'+fv+'</button>'+st+'</div>';
+  const sek=(u.track==='sd'||u.track==='smp'||u.track==='sma'||u.track==='smk')?('Kelas '+E(u.kelas)+' · '):((u.level||'')!==''?E(u.level)+' · ':'');
+  return '<div class="mod"><div class="mi">📄</div><div class="mb" style="cursor:pointer" data-open="'+E(u.id)+'"><h4>'+E(u.judul)+bd+belum+'</h4><p>'+sek+E(u.mapel)+'</p></div><button class="opt" style="width:auto;padding:6px 10px;margin:0;flex:none" data-fav="'+E(u.id)+'">'+fv+'</button>'+st+'</div>';
 }
 function renderCatalog(){
   if(!KUR){$('catBody').textContent='Katalog belum termuat (offline & belum ada cache).';return}
@@ -644,11 +657,11 @@ function openUnit(id){
   const u=KUR.find(x=>x.id===id);if(!u)return;
   if(!u.materi||!u.soal||!u.soal.length){alert('Materi unit ini belum tersedia — ditambahkan melalui panel admin.');return}
   kurAns={};curUnit=u;S.last=id;save();renderHome();
-  $('kurMateri').innerHTML='<h3>'+u.judul+'</h3>'+(u.status==='demo'?'<p style="font-size:11px;color:var(--gold2)">⚠️ Materi demonstrasi — belum tervalidasi resmi.</p>':'')+u.materi;
+  $('kurMateri').innerHTML='<h3>'+E(u.judul)+'</h3>'+(u.status==='demo'?'<p style="font-size:11px;color:var(--gold2)">⚠️ Materi demonstrasi — belum tervalidasi resmi.</p>':'')+cleanHTML(u.materi);
   let h='';
   u.soal.forEach((q,qi)=>{
-    h+='<div class="q"><h4>'+(qi+1)+'. '+q.q+'</h4>';
-    q.o.forEach((o,oi)=>{h+='<button class="opt" id="ko'+qi+'_'+oi+'" onclick="kurPick('+qi+','+oi+')">'+String.fromCharCode(65+oi)+'. '+o+'</button>'});
+    h+='<div class="q"><h4>'+(qi+1)+'. '+E(q.q)+'</h4>';
+    q.o.forEach((o,oi)=>{h+='<button class="opt" id="ko'+qi+'_'+oi+'" onclick="kurPick('+qi+','+oi+')">'+String.fromCharCode(65+oi)+'. '+E(o)+'</button>'});
     h+='</div>';
   });
   $('kurQuiz').innerHTML=h;$('kurScore').innerHTML='';$('kurSubmit').disabled=false;
@@ -661,7 +674,7 @@ function submitKur(){
   const u=curUnit,n=u.soal.length;
   if(Object.keys(kurAns).length<n){alert('Jawab semua '+n+' soal dulu.');return}
   let c=0,rem=[];
-  u.soal.forEach((q,qi)=>{const ok=kurAns[qi]===q.a;if(ok)c++;else rem.push({i:qi+1,benar:String.fromCharCode(65+q.a)+'. '+q.o[q.a],p:q.p||'—'})});
+  u.soal.forEach((q,qi)=>{const ok=kurAns[qi]===q.a;if(ok)c++;else rem.push({i:qi+1,benar:String.fromCharCode(65+q.a)+'. '+E(q.o[q.a]),p:E(q.p||'—')})});
   const sc=Math.round(c/n*100),pass=sc>=70;
   S.done[u.id]={score:sc,date:new Date().toISOString().slice(0,10)};save();
   pushSync();
@@ -732,6 +745,13 @@ function placePick(oi){
 renderHome();
 pullSync();
 loadKur();
+// Delegasi klik: ID unit dibaca dari atribut data-* (bukan disisipkan ke kode handler).
+document.addEventListener('click',function(ev){
+  var t=ev.target.closest?ev.target.closest('[data-open],[data-fav]'):null;if(!t)return;
+  if(t.hasAttribute('data-fav')){favToggle(t.getAttribute('data-fav'));return}
+  openUnit(t.getAttribute('data-open'));
+});
+
 </script>
 </body>
 </html>
