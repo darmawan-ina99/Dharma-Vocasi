@@ -547,10 +547,10 @@ const TRACKS={
  voc:{ic:'💼',nm:'Jalur Vokasi',ds:'8 jalur skill digital'}
 };
 const LANGS=[
- {id:'eng',nm:'English',lv:['A1','A2','B1','B2','C1','C2'],ref:'CEFR'},
- {id:'deu',nm:'Deutsch',lv:['A1','A2','B1','B2','C1','C2'],ref:'Goethe-Zertifikat (referensi)'},
- {id:'jpn',nm:'Nihongo 日本語',lv:['N5','N4','N3','N2','N1'],ref:'JLPT (referensi)'},
- {id:'zho',nm:'Zhongwen 中文',lv:['HSK1','HSK2','HSK3','HSK4','HSK5','HSK6'],ref:'HSK (referensi)'}];
+ {id:'eng',nm:'English',keys:['English'],lv:['A1','A2','B1','B2','C1','C2'],ref:'CEFR'},
+ {id:'deu',nm:'Deutsch',keys:['Deutsch'],lv:['A1','A2','B1','B2','C1','C2'],ref:'Goethe-Zertifikat (referensi)'},
+ {id:'jpn',nm:'Nihongo 日本語',keys:['日本語','Nihongo','Japanese'],lv:['N5','N4','N3','N2','N1'],ref:'JLPT (referensi)'},
+ {id:'zho',nm:'Zhongwen 中文',keys:['中文','Zhōngwén','Zhongwen','Mandarin'],lv:['HSK1','HSK2','HSK3','HSK4','HSK5','HSK6'],ref:'HSK (referensi)'}];
 const VOCS=[
  {id:'office',nm:'Digital Office'},{id:'desain',nm:'Desain Digital'},{id:'web',nm:'Web Development'},
  {id:'aicontent',nm:'AI Content Creator'},{id:'databisnis',nm:'Data & Bisnis'},{id:'digimark',nm:'Digital Marketing'},
@@ -566,6 +566,7 @@ function loadKur(){
 }
 function say(t,l){try{const u=new SpeechSynthesisUtterance(t);u.lang=l;u.rate=.85;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
 function favToggle(id){if(!S.fav)S.fav={};if(S.fav[id])delete S.fav[id];else S.fav[id]=1;save();renderHome();if(curList)showUnits(curList,curTitle,curDesc)}
+function langUnitMatches(u,L){var hay=String(u&&u.mapel||'').toLowerCase();return u&&u.track==='lang'&&(L.keys||[L.nm]).some(function(k){return hay.indexOf(String(k).toLowerCase())>=0})}
 let curList=null,curTitle='',curDesc='';
 function unitRow(u){
   const d=S.done[u.id];
@@ -587,7 +588,7 @@ function renderCatalog(){
   }
   h+='</div><h2 class="sec" style="margin-top:16px">Akademi Bahasa</h2><div class="grid">';
   for(const L of LANGS){
-    const n=KUR.filter(u=>u.track==='lang'&&u.mapel.toLowerCase().indexOf(L.nm.split(' ')[0].toLowerCase())>=0).length;
+    const n=KUR.filter(function(u){return langUnitMatches(u,L)}).length;
     h+='<div class="prog" onclick="openLang(\''+L.id+'\')"><div class="ic">🌐</div><h3>'+L.nm+'</h3><p>'+L.lv.join(' · ')+'</p><span class="nmod">'+n+' unit · '+L.ref+'</span></div>';
   }
   h+='</div><div style="margin-top:12px"><button class="btn alt" onclick="openPlace(\'eng\')">🧭 Tes Penempatan Bahasa Inggris</button></div>';
@@ -630,13 +631,17 @@ function openKelas(t,k){
   }
   $('mapelList').innerHTML=h;go('mapel');
 }
+function openLangLevel(lid,lv){
+  const L=LANGS.find(x=>x.id===lid);
+  showUnits(KUR.filter(function(u){return langUnitMatches(u,L)&&u.level===lv}),L.nm+' '+lv,'Persiapan mandiri — bukan sertifikasi resmi.');
+}
 function openLang(lid){
   const L=LANGS.find(x=>x.id===lid);
   $('mapelTitle').textContent='🌐 '+L.nm+' ('+L.ref+')';
   let h='';
   for(const lv of L.lv){
-    const lu=KUR.filter(u=>u.track==='lang'&&u.level===lv&&u.mapel.toLowerCase().indexOf(L.nm.split(' ')[0].toLowerCase())>=0);
-    h+='<div class="mod" onclick="showUnits(KUR.filter(u=>u.track===\'lang\'&&u.level===\''+lv+'\'&&u.mapel.toLowerCase().indexOf(\''+L.nm.split(' ')[0].toLowerCase()+'\')>=0),\''+L.nm+' '+lv+'\',\'Persiapan mandiri — bukan sertifikasi resmi.\')"><div class="mi">'+lv+'</div><div class="mb"><h4>'+L.nm+' '+lv+'</h4><p>'+lu.length+' unit</p></div></div>';
+    const lu=KUR.filter(function(u){return langUnitMatches(u,L)&&u.level===lv});
+    h+='<div class="mod" onclick="openLangLevel(\''+L.id+'\',\''+lv+'\')"><div class="mi">'+lv+'</div><div class="mb"><h4>'+L.nm+' '+lv+'</h4><p>'+lu.length+' unit</p></div></div>';
   }
   h+='<p class="small">Pengakuan kelulusan: internal Dharma Labs saja.</p>';
   $('mapelList').innerHTML=h;go('mapel');
