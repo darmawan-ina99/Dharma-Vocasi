@@ -142,9 +142,18 @@ nav button .ni{display:block;font-size:19px}
 </div>
 </div>
 
+<div class="page" id="p-verify">
+  <h2 class="sec">🔎 Verifikasi Sertifikat</h2>
+  <p class="desc">Masukkan kode verifikasi untuk mengecek keaslian sertifikat Dharma Labs.</p>
+  <input class="txt" id="vCode" placeholder="Contoh: DL-MV-XXXXXXXX" maxlength="16" style="text-transform:uppercase">
+  <div style="margin-top:12px"><button class="btn" onclick="verifyCert()">Cek Keaslian</button></div>
+  <div id="vResult" style="margin-top:14px"></div>
+</div>
+
 <nav>
   <button id="nv-home" class="on" onclick="go('home')"><span class="ni">🏠</span>Beranda</button>
   <button id="nv-cert" onclick="go('cert')"><span class="ni">🎓</span>Sertifikat</button>
+  <button id="nv-verify" onclick="go('verify')"><span class="ni">🔎</span>Verifikasi</button>
 </nav>
 
 <script>
@@ -257,6 +266,48 @@ const PROG = {
   ]}
 };
 const PASS = 70; // nilai minimal tiap kuis (%)
+// ================== CLOUD SYNC (Supabase — Dharma Labs) ==================
+const MV = {
+  url: 'https://whtsromktkymksuvagrw.supabase.co/rest/v1/rpc/',
+  key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndodHNyb21rdGt5bWtzdXZhZ3J3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzNTMzMTIsImV4cCI6MjEwNjkyOTMxMn0.Ey3dgYFJP0rI57eBkNtFgJjl_Qf-KI0H7dpfD_t4Kos', app: 'mv-DJOrpw5N0iMIELtz',
+  dk: null, busy: false
+};
+try { MV.dk = localStorage.getItem('mv_key') || null; } catch (e) {}
+if (!MV.dk) {
+  MV.dk = 'mv-' + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  try { localStorage.setItem('mv_key', MV.dk); } catch (e) {}
+}
+function mvRpc(fn, body) {
+  return fetch(MV.url + fn, {
+    method: 'POST',
+    headers: { 'apikey': MV.key, 'Authorization': 'Bearer ' + MV.key, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+}
+function pushSync() {
+  if (MV.busy) return; MV.busy = true;
+  var arr = [];
+  for (var id in S.done) arr.push({ id: id, s: S.done[id].score });
+  mvRpc('mv_up', { p_app: MV.app, p_key: MV.dk, p_name: S.name || '', p_city: S.city || '', p_prog: arr })
+    .then(function () { MV.busy = false; })
+    .catch(function () { MV.busy = false; setTimeout(pushSync, 20000); });
+}
+function pullSync() {
+  mvRpc('mv_get', { p_app: MV.app, p_key: MV.dk }).then(function (d) {
+    if (!d || !d.progress) return;
+    var changed = false;
+    for (var id in d.progress) {
+      var sc = d.progress[id];
+      if (!S.done[id] || S.done[id].score < sc) {
+        S.done[id] = { score: sc, date: (d.issued_at || '').slice(0, 10) || S.done[id] && S.done[id].date || '' };
+        changed = true;
+      }
+    }
+    if (!S.name && d.name) S.name = d.name;
+    if (!S.city && d.city) S.city = d.city;
+    if (changed) { save(); renderHome(); if (curProg) openProg(curProg); }
+  }).catch(function () {});
+}
 // ================== STATE ==================
 const KEY='mv_v1';
 let S={name:'',city:'',done:{}};
@@ -331,6 +382,7 @@ function submitQuiz(){
   S.done[curMod.id]={score:score,date:new Date().toISOString().slice(0,10)};
   if(pass&&S.done[curMod.id].first===undefined){/*tetap*/}
   save();
+  if (pass) pushSync();
   $('scoreBox').innerHTML=`<div class="score"><div class="big" style="color:${pass?'#00d4aa':'#f5c518'}">${score}</div>
     <div>${pass?'✅ LULUS — modul ini selesai!':'⟳ Belum lulus. Baca ulang materi, lalu coba lagi — tidak ada batas percobaan.'}</div>
     <div style="margin-top:12px"><button class="btn alt" onclick="go('mods')">‹ Kembali ke daftar modul</button></div></div>`;
@@ -378,11 +430,41 @@ function makeCert(){
   $('crtBody').innerHTML=`telah menyelesaikan program pembelajaran jarak jauh<br><b>${p.name}</b> (${p.mods.length} modul)${city?'<br>Asal: '+city:''}<br>dengan capaian kuis memuaskan pada Maestro Vokasi.`;
   $('certForm').querySelector('.foot');
   const foot=$('certArea');
-  $('crtKode').textContent='Kode Verifikasi: '+kode+' · Diterbitkan: '+tgl;
   $('certForm').style.display='none';
   $('certArea').style.display='block';
+  $('crtKode').textContent='Menerbitkan sertifikat…';
+  mvRpc('mv_issue', { p_app: MV.app, p_key: MV.dk, p_program: pk.value })
+    .then(function (r) {
+      if (r && r.ok) {
+        $('crtKode').textContent = 'Kode Verifikasi: ' + r.code + ' · Diterbitkan: ' + tgl;
+      } else {
+        $('crtKode').textContent = 'Kode (lokal): ' + kode + ' · ' + tgl + ' — perangkat offline, kode server belum terbit';
+      }
+    })
+    .catch(function () {
+      $('crtKode').textContent = 'Kode (lokal): ' + kode + ' · ' + tgl + ' — perangkat offline, kode server belum terbit';
+    });
+}
+function verifyCert() {
+  var code = ($('vCode').value || '').trim().toUpperCase();
+  var box = $('vResult');
+  if (!code) { box.innerHTML = '<div class="materi"><p>Isi kode dulu ya.</p></div>'; return }
+  box.innerHTML = '<div class="materi"><p>⏳ Memeriksa ke server…</p></div>';
+  mvRpc('mv_verify', { p_app: MV.app, p_code: code })
+    .then(function (d) {
+      if (d && d.ok) {
+        var pn = { sd: 'Paket Dasar SD', smp: 'Paket Dasar SMP', sma: 'Paket Dasar SMA', skill: 'Kelas Skill' };
+        box.innerHTML = '<div class="materi" style="border-color:#00d4aa"><h3 style="color:#00d4aa">✅ SERTIFIKAT SAH</h3><p><b>' + (d.name || '-') + '</b>' + (d.city ? ' — ' + d.city : '') + '</p><p>Program: <b>' + (pn[d.program] || d.program) + '</b></p><p>Diterbitkan: ' + new Date(d.issued_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) + '</p></div>';
+      } else {
+        box.innerHTML = '<div class="materi" style="border-color:#f87171"><h3 style="color:#f87171">✕ TIDAK DITEMUKAN</h3><p>Kode tidak terdaftar. Periksa penulisan kode atau hubungi 0851-5116-4342.</p></div>';
+      }
+    })
+    .catch(function () {
+      box.innerHTML = '<div class="materi"><p>✕ Gagal terhubung. Periksa koneksi internet lalu coba lagi.</p></div>';
+    });
 }
 renderHome();
+pullSync();
 </script>
 </body>
 </html>
