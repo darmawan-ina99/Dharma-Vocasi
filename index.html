@@ -1,17 +1,388 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0D0D0D" />
-  <title>Maestro Vokasi</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; }
-    body { background: #0D0D0D; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#0D0D0D">
+<title>Maestro Vokasi — Dharma Labs</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0D0D0D;--card:#16161d;--line:#2a2a33;--gold:#d4a017;--gold2:#f5c518;--acc:#00d4aa;--txt:#f0f0f5;--dim:#a6a6b8}
+body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',system-ui,sans-serif;line-height:1.6;padding-bottom:80px}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px}
+header{padding:26px 16px 18px;text-align:center;border-bottom:1px solid var(--line)}
+header .logo{font-family:Syne;font-weight:800;font-size:24px;letter-spacing:.5px}
+header .logo span{color:var(--gold2)}
+header .sub{color:var(--dim);font-size:13px;margin-top:4px}
+.ticker{overflow:hidden;white-space:nowrap;border-bottom:1px solid var(--line);background:#101014;padding:7px 0}
+.ticker .tk{display:inline-block;animation:mq 16s linear infinite;color:var(--gold2);font-size:12px;font-weight:600}
+.ticker span{padding-right:70px}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.page{display:none;padding-top:18px}
+.page.on{display:block}
+h2.sec{font-family:Syne;font-weight:700;font-size:19px;margin:6px 0 4px}
+p.desc{color:var(--dim);font-size:13.5px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.prog{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;cursor:pointer;transition:transform .15s,border-color .2s}
+.prog:active{transform:scale(.97)}
+.prog:hover{border-color:var(--gold)}
+.prog .ic{font-size:30px}
+.prog h3{font-family:Syne;font-size:15px;margin:6px 0 3px}
+.prog p{font-size:12px;color:var(--dim)}
+.prog .nmod{display:inline-block;margin-top:8px;font-size:11px;background:#1d1d26;color:var(--acc);border-radius:10px;padding:2px 9px}
+.mod{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;display:flex;gap:12px;align-items:center}
+.mod .mi{font-size:24px;width:42px;height:42px;background:#1d1d26;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none}
+.mod .mb{flex:1;min-width:0}
+.mod h4{font-size:14px}
+.mod p{font-size:12px;color:var(--dim)}
+.mod .stat{flex:none;font-size:11px;font-weight:700}
+.st-pass{color:var(--acc)}
+.st-try{color:var(--gold2)}
+.btn{display:inline-block;width:100%;text-align:center;background:linear-gradient(135deg,#f5c518,#d4a017);color:#000;border:none;border-radius:12px;padding:14px;font-weight:700;font-size:15px;font-family:inherit;cursor:pointer}
+.btn.alt{background:transparent;border:1.5px solid var(--line);color:var(--txt)}
+.btn:disabled{filter:grayscale(1);opacity:.4}
+.back{background:none;border:none;color:var(--dim);font-size:13px;cursor:pointer;font-family:inherit;margin-bottom:10px;padding:0}
+.materi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;font-size:14.5px;margin-bottom:14px}
+.materi h3{font-family:Syne;margin-bottom:10px;font-size:17px}
+.materi p{margin-bottom:10px;color:#dcdce6}
+.materi b{color:var(--gold2)}
+.quiz .q{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.quiz .q h4{font-size:14px;margin-bottom:10px}
+.opt{display:block;width:100%;text-align:left;background:#1d1d26;border:1.5px solid var(--line);color:var(--txt);border-radius:10px;padding:11px 13px;font-size:13.5px;margin-bottom:8px;cursor:pointer;font-family:inherit}
+.opt.sel{border-color:var(--gold);background:#26210f}
+.score{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;text-align:center;margin-top:8px}
+.score .big{font-size:42px;font-weight:800;font-family:Syne}
+.progressbar{height:8px;background:#1d1d26;border-radius:6px;overflow:hidden;margin:10px 0 16px}
+.progressbar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--gold2));border-radius:6px;transition:width .4s}
+input.txt{width:100%;background:#1d1d26;border:1.5px solid var(--line);border-radius:12px;color:var(--txt);padding:13px;font-size:15px;font-family:inherit;outline:none}
+input.txt:focus{border-color:var(--gold)}
+label.lbl{display:block;font-size:12.5px;color:var(--dim);margin:10px 0 5px}
+/* sertifikat */
+.cert{background:#fffdf6;color:#1a1a1a;border:10px double var(--gold);border-radius:6px;padding:28px 20px;text-align:center;font-family:Georgia,'Times New Roman',serif}
+.cert .cl{font-size:11px;letter-spacing:4px;color:#8a6d1a}
+.cert h1{font-family:Syne;font-size:24px;margin:6px 0 2px;color:#000}
+.cert .nama{font-size:26px;font-weight:700;margin:16px 0 6px;font-family:Syne;border-bottom:2px solid var(--gold);display:inline-block;padding:0 14px 4px}
+.cert .body{font-size:14px;margin:12px 0;color:#333}
+.cert .seal{width:74px;height:74px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe28a,var(--gold));color:#3a2b00;display:inline-flex;align-items:center;justify-content:center;font-family:Syne;font-weight:800;font-size:22px;margin-top:12px;box-shadow:0 2px 8px #0003}
+.cert .foot{font-size:11px;color:#555;margin-top:14px}
+.cert .kode{font-size:12px;color:#8a6d1a;font-weight:700;letter-spacing:1px}
+@media print{body *{visibility:hidden}#certArea,#certArea *{visibility:visible}#certArea{position:absolute;left:0;top:0;width:100%}.noprint{display:none}}
+nav{position:fixed;bottom:0;left:0;right:0;background:#131318;border-top:1px solid var(--line);display:flex;z-index:9}
+nav button{flex:1;background:none;border:none;color:var(--dim);padding:11px 4px 13px;font-size:11px;font-family:inherit;cursor:pointer}
+nav button.on{color:var(--gold2)}
+nav button .ni{display:block;font-size:19px}
+.small{font-size:12px;color:var(--dim);text-align:center;margin-top:10px}
+</style>
 </head>
 <body>
-  <div id="root"></div>
+<header>
+  <div class="logo">Maestro <span>Vokasi</span></div>
+  <div class="sub">Pembelajaran Jarak Jauh — Dharma Labs Digital</div>
+</header>
+<div class="ticker"><div class="tk"><span>Belajar kapan saja, di mana saja ✦ Kurikulum SD · SMP · SMA + Kelas Skill ✦ Selesaikan kuis, raih Sertifikat Non-Formal dari Dharma Labs ✦ Belajar kapan saja, di mana saja ✦ Kurikulum SD · SMP · SMA + Kelas Skill ✦ Selesaikan kuis, raih Sertifikat Non-Formal dari Dharma Labs ✦ </span><span>Belajar kapan saja, di mana saja ✦ Kurikulum SD · SMP · SMA + Kelas Skill ✦ Selesaikan kuis, raih Sertifikat Non-Formal dari Dharma Labs ✦ Belajar kapan saja, di mana saja ✦ Kurikulum SD · SMP · SMA + Kelas Skill ✦ Selesaikan kuis, raih Sertifikat Non-Formal dari Dharma Labs ✦ </span></div></div>
+
+<div class="wrap">
+<!-- BERANDA -->
+<div class="page on" id="p-home">
+  <h2 class="sec">Pilih Program Belajar</h2>
+  <p class="desc">Tempuh semua modul satu program, lulus kuis tiap modul, dan dapatkan Sertifikat Non-Formal Dharma Labs.</p>
+  <div class="grid" id="progGrid"></div>
+  <div class="progressbar"><i id="pbBar" style="width:0%"></i></div>
+  <div class="small" id="pbTxt"></div>
+</div>
+
+<!-- MODUL LIST -->
+<div class="page" id="p-mods">
+  <button class="back" onclick="go('home')">‹ Kembali</button>
+  <h2 class="sec" id="modTitle"></h2>
+  <p class="desc" id="modDesc"></p>
+  <div id="modList"></div>
+  <div style="margin-top:14px">
+    <button class="btn" id="btnCert" onclick="openCert()">🎓 Ambil Sertifikat</button>
+  </div>
+</div>
+
+<!-- MATERI + KUIS -->
+<div class="page" id="p-learn">
+  <button class="back" onclick="go('mods')">‹ Daftar modul</button>
+  <div class="materi" id="materiBox"></div>
+  <div class="quiz" id="quizBox"></div>
+  <button class="btn" id="btnSubmit" onclick="submitQuiz()">Kirim Jawaban</button>
+  <div id="scoreBox"></div>
+</div>
+
+<!-- SERTIFIKAT -->
+<div class="page" id="p-cert">
+  <button class="back noprint" onclick="go('home')">‹ Beranda</button>
+  <div id="certForm" class="materi">
+    <h3>🎓 Sertifikat Penyelesaian</h3>
+    <p>Isi nama lengkap yang akan tercetak pada sertifikat.</p>
+    <label class="lbl">Nama lengkap</label>
+    <input class="txt" id="cName" maxlength="40">
+    <label class="lbl">Asal kota/institusi (opsional)</label>
+    <input class="txt" id="cCity" maxlength="40">
+    <div style="margin-top:14px"><button class="btn" onclick="makeCert()">Buat Sertifikat</button></div>
+  </div>
+  <div id="certArea" style="display:none">
+    <div class="cert">
+      <div class="cl">DHARMA LABS DIGITAL</div>
+      <h1>SERTIFIKAT NON-FORMAL</h1>
+      <div class="body">Diberikan kepada</div>
+      <div class="nama" id="crtNama"></div>
+      <div class="body" id="crtBody"></div>
+      <div class="seal">DL</div>
+      <div class="foot">Diterbitkan oleh <b>Dharma Labs Digital</b> — Program Pembelajaran Jarak Jauh Maestro Vokasi<br>Kontak: 0851-5116-4342</div>
+      <div class="kode" id="crtKode"></div>
+    </div>
+    <div class="noprint" style="margin-top:14px">
+      <button class="btn" onclick="window.print()">🖨 Cetak / Simpan PDF</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<nav>
+  <button id="nv-home" class="on" onclick="go('home')"><span class="ni">🏠</span>Beranda</button>
+  <button id="nv-cert" onclick="go('cert')"><span class="ni">🎓</span>Sertifikat</button>
+</nav>
+
+<script>
+"use strict";
+// ================== KURIKULUM ==================
+const PROG = {
+  sd:{icon:'📚',name:'Paket Dasar SD',desc:'Kemampuan dasar jenjang sekolah dasar',mods:[
+    {id:'sd-mat',icon:'➗',title:'Matematika Dasar',body:'Operasi hitung, pecahan, dan pengukuran',
+     materi:'<h3>➗ Matematika Dasar SD</h3><p><b>Operasi hitung</b> adalah fondasi semua matematika. Urutan pengerjaan: kurung dulu, lalu kali/bagi, terakhir tambah/kurang.</p><p><b>Pecahan</b> menyatakan bagian dari keseluruhan. Pecahan 3/4 artinya 3 dari 4 bagian sama besar. Untuk menjumlah pecahan, samakan dulu penyebutnya: 1/2 + 1/4 = 2/4 + 1/4 = 3/4.</p><p><b>Pengukuran:</b> 1 km = 1.000 m; 1 kg = 1.000 g; 1 jam = 60 menit. Perkalian adalah penjumlahan berulang: 6 × 4 = 6 + 6 + 6 + 6 = 24.</p>',
+     quiz:[
+      {q:'Hasil dari 25 × 4 adalah…',o:['75','100','125','90'],a:1},
+      {q:'1/2 + 1/4 = …',o:['2/6','1/6','3/4','1/8'],a:2},
+      {q:'Urutan pengerjaan hitung yang benar adalah…',o:['Tambah dulu, kali kemudian','Kurung dulu, lalu kali/bagi','Kurang dulu, tambah kemudian','Semua sama saja'],a:1},
+      {q:'2 km + 500 m = …',o:['2.500 m','2.050 m','205 m','25.000 m'],a:0},
+      {q:'Perkalian 6 × 4 sama artinya dengan…',o:['6 + 4','empat kali bilangan enam','enam dibagi empat','empat dikurangi enam'],a:1}]},
+    {id:'sd-bind',icon:'📖',title:'Bahasa Indonesia',body:'Membaca pemahaman dan kalimat efektif',
+     materi:'<h3>📖 Bahasa Indonesia SD</h3><p><b>Membaca pemahaman</b> berarti memahami isi bacaan, bukan sekadar melafalkan kata. Tips: baca dua kali, tandai kata sulit, lalu jelaskan ulang dengan bahasa sendiri.</p><p><b>Kalimat efektif</b> memiliki subjek, predikat, dan objek yang jelas. Contoh: "Adik membaca buku." Kalimat tidak efektif: "Adik yang membaca itu buku di perpustakaan sedang."</p><p><b>Gagasan utama</b> sebuah paragraf biasanya ada di kalimat pertama (kalimat topik). Paragraf yang baik berisi satu gagasan utama.</p>',
+     quiz:[
+      {q:'Gagasan utama paragraf biasanya terdapat pada…',o:['Kalimat pertama','Kalimat terakhir','Semua kalimat','Tidak ada'],a:0},
+      {q:'Kalimat efektif harus memiliki…',o:['Kata sulit','Subjek dan predikat jelas','Banyak koma','Rima'],a:1},
+      {q:'"Ibu memasak nasi." Kata "memasak" berperan sebagai…',o:['Subjek','Objek','Predikat','Keterangan'],a:2},
+      {q:'Tujuan membaca pemahaman adalah…',o:['Cepat selesai','Memahami isi bacaan','Menghafal huruf','Suara keras'],a:1},
+      {q:'Kalimat "Adik yang membaca itu buku di" termasuk…',o:['Efektif','Tidak efektif','Pertanyaan','Perintah'],a:1}]},
+    {id:'sd-ipa',icon:'🌱',title:'IPA Dasar',body:'Makhluk hidup dan lingkungan',
+     materi:'<h3>🌱 IPA Dasar SD</h3><p><b>Ciri makhluk hidup:</b> bernapas, bergerak, tumbuh, berkembang biak, memerlukan makan, dan peka terhadap rangsang.</p><p><b>Rantai makan:</b> matahari → padi → tikus → ular. Produsen (padi) membuat makanan sendiri dengan fotosintesis; konsumen memakan makhluk hidup lain.</p><p><b>Daur hidup kupu-kupu:</b> telur → ulat (larva) → kepompong (pupa) → kupu-kupu. Ini disebut metamorfosis sempurna.</p><p><b>Lingkungan sehat</b> dijaga dengan mengurangi sampah plastik, menanam pohon, dan hemat air.</p>',
+     quiz:[
+      {q:'Makhluk hidup yang mampu membuat makanan sendiri disebut…',o:['Konsumen','Produsen','Pengurai','Predator'],a:1},
+      {q:'Urutan daur hidup kupu-kupu yang benar…',o:['Ulat → telur → kupu-kupu','Telur → ulat → kepompong → kupu-kupu','Kepompong → telur → ulat','Kupu-kupu → ulat → telur'],a:1},
+      {q:'Berikut yang BUKAN ciri makhluk hidup…',o:['Bernapas','Berkembang biak','Mengeluarkan cahaya sendiri','Tumbuh'],a:2},
+      {q:'Dalam rantai makan "padi → tikus → ular", padi berperan sebagai…',o:['Konsumen','Produsen','Pengurai','Pemangsa'],a:1},
+      {q:'Fotosintesis memerlukan…',o:['Cahaya matahari','Lampu neon','Angin','Batu'],a:0}]}
+  ]},
+  smp:{icon:'🧮',name:'Paket Dasar SMP',desc:'Kemampuan dasar jenjang sekolah menengah pertama',mods:[
+    {id:'smp-mat',icon:'🔢',title:'Aljabar Dasar',body:'Variabel, persamaan linear, dan bilangan',
+     materi:'<h3>🔢 Aljabar Dasar SMP</h3><p><b>Variabel</b> adalah lambang untuk bilangan yang belum diketahui, biasanya huruf x atau y. 3x artinya 3 dikali x.</p><p><b>Persamaan linear satu variabel:</b> 2x + 5 = 15 → 2x = 15 − 5 → 2x = 10 → x = 5. Persamaan diselesaikan dengan menjaga kedua sisi tetap seimbang.</p><p><b>Operasi bilangan:</b> negatif kali negatif = positif: (−3) × (−2) = 6. Tanda kurung penting: −(x − 3) = −x + 3.</p>',
+     quiz:[
+      {q:'Jika 2x + 5 = 15, maka x = …',o:['3','5','7','10'],a:1},
+      {q:'Hasil (−3) × (−2) adalah…',o:['−6','6','5','−5'],a:1},
+      {q:'−(x − 3) sama dengan…',o:['−x − 3','−x + 3','x − 3','x + 3'],a:1},
+      {q:'3x + 2x = …',o:['5x','6x','5x²','x⁵'],a:0},
+      {q:'Jika x = 4, nilai 3x − 2 adalah…',o:['10','12','14','9'],a:0}]},
+    {id:'smp-ipa',icon:'⚗️',title:'Zat dan Perubahannya',body:'Materi, atom, dan reaksi kimia',
+     materi:'<h3>⚗️ Zat dan Perubahannya</h3><p><b>Zat</b> adalah materi yang punya susunan dan sifat tetap. Wujudnya: padat, cair, dan gas.</p><p><b>Perubahan fisika</b> tidak menghasilkan zat baru (es mencair). <b>Perubahan kimia</b> menghasilkan zat baru (kertas terbakar menjadi arang dan asap).</p><p><b>Atom</b> adalah bagian terkecil zat. Molekul gabungan atom: air = H₂O (2 atom hidrogen + 1 atom oksigen).</p><p><b>Pemisahan campuran:</b> penyaringan (saringan), evaporasi (garam dari air laut), distilasi (alkohol).</p>',
+     quiz:[
+      {q:'Es mencair termasuk perubahan…',o:['Kimia','Fisika','Atom','Nuklir'],a:1},
+      {q:'Rumus kimia air adalah…',o:['CO₂','O₂','H₂O','NaCl'],a:2},
+      {q:'Memisahkan garam dari air laut dapat dengan…',o:['Penyaringan','Evaporasi','Magnet','Sentrifusi'],a:1},
+      {q:'Kertas terbakar menjadi arang adalah contoh…',o:['Perubahan fisika','Perubahan kimia','Perubahan wujud','Campuran'],a:1},
+      {q:'Atom adalah…',o:['Bagian terkecil zat','Molekul besar','Zat baru','Energi murni'],a:0}]},
+    {id:'smp-eng',icon:'🌍',title:'Bahasa Inggris Dasar',body:'Greetings, introduction, dan simple present',
+     materi:'<h3>🌍 Bahasa Inggris Dasar</h3><p><b>Greetings:</b> Good morning (pagi), Good afternoon (siang), Good evening (malam), How are you? — I am fine, thank you.</p><p><b>Perkenalan:</b> "My name is Budi. I am from Lampung." Menanyakan nama: "What is your name?"</p><p><b>Simple present</b> untuk kebiasaan: I go to school every day. Untuk orang ketiga tunggal tambahkan -s/-es: She goes to school. Kata tanya: What (apa), Where (di mana), When (kapan), Who (siapa).</p>',
+     quiz:[
+      {q:'"Selamat pagi" dalam bahasa Inggris…',o:['Good night','Good morning','Good evening','Goodbye'],a:1},
+      {q:'Bentuk benar: She … to school every day.',o:['go','goes','going','gone'],a:1},
+      {q:'"What is your name?" dipakai untuk…',o:['Menanyakan nama','Menanyakan tempat','Menanyakan waktu','Menyapa'],a:0},
+      {q:'"I am fine, thank you" adalah jawaban untuk…',o:['What is this?','Where are you?','How are you?','Who are you?'],a:2},
+      {q:'Kata "Where" berarti…',o:['Siapa','Kapan','Di mana','Apa'],a:2}]}
+  ]},
+  sma:{icon:'🎓',name:'Paket Dasar SMA',desc:'Kemampuan dasar jenjang sekolah menengah atas',mods:[
+    {id:'sma-mat',icon:'📐',title:'Fungsi Kuadrat',body:'Persamaan kuadrat dan grafik parabola',
+     materi:'<h3>📐 Fungsi Kuadrat</h3><p><b>Bentuk umum:</b> f(x) = ax² + bx + c, dengan a ≠ 0. Grafiknya berupa <b>parabola</b>.</p><p><b>Akar-akar</b> dicari dengan rumus abc: x = (−b ± √(b² − 4ac)) / 2a. Nilai b² − 4ac disebut diskriminan (D).</p><p>D > 0 → dua akar berbeda; D = 0 → satu akar kembar; D < 0 → tidak punya akar riil.</p><p><b>Contoh:</b> x² − 5x + 6 = 0 → (x−2)(x−3)=0 → x = 2 atau x = 3.</p>',
+     quiz:[
+      {q:'Akar dari x² − 5x + 6 = 0 adalah…',o:['x=2 dan x=3','x=1 dan x=6','x=−2 dan x=−3','x=5 dan x=6'],a:0},
+      {q:'Diskriminan persamaan kuadrat dirumuskan…',o:['b² + 4ac','b² − 4ac','4ac − b²','2b − 4ac'],a:1},
+      {q:'Jika D < 0, persamaan kuadrat…',o:['Punya dua akar','Satu akar kembar','Tidak punya akar riil','Semua akar positif'],a:2},
+      {q:'Grafik fungsi kuadrat berbentuk…',o:['Garis lurus','Parabola','Lingkaran','Elips'],a:1},
+      {q:'Pada f(x) = 2x² − 4x + 1, nilai a adalah…',o:['2','−4','1','0'],a:0}]},
+    {id:'sma-bind',icon:'📝',title:'Teks Argumentasi',body:'Menyusun argumen yang logis dan meyakinkan',
+     materi:'<h3>📝 Teks Argumentasi SMA</h3><p><b>Teks argumentasi</b> bertujuan memengaruhi pembaca dengan argumen logis. Struktur: pernyataan pendapat → rangkaian alasan → penegasan ulang.</p><p><b>Argumen kuat</b> didukung fakta, data, atau otoritas ahli — bukan sekadar asumsi. "Menurut data BPS (2023)" lebih kuat daripada "katanya".</p><p><b>Kesalahan logika umum:</b> menyerang pribadi (ad hominem), bukan gagasan; generalisasi berlebihan dari satu kasus.</p>',
+     quiz:[
+      {q:'Tujuan teks argumentasi adalah…',o:['Menghibur pembaca','Memengaruhi dengan argumen logis','Menjelaskan langkah kerja','Menyampaikan perasaan'],a:1},
+      {q:'Argumen paling kuat didukung oleh…',o:['Perasaan pribadi','Fakta dan data','Lelucon','Rumor'],a:1},
+      {q:'Menyerang pribadi pembicara, bukan gagasannya, disebut…',o:['Ad hominem','Ad populum','Straw man','Red herring'],a:0},
+      {q:'Urutan struktur teks argumentasi…',o:['Alasan → pendapat → penegasan','Pendapat → alasan → penegasan ulang','Penegasan → pendapat → data','Data → lelucon → penegasan'],a:1},
+      {q:'"Katanya semua orang setuju" termasuk…',o:['Fakta terukur','Generalisasi lemah berbasis rumor','Data statistik','Kutipan ahli'],a:1}]},
+    {id:'sma-eko',icon:'📈',title:'Ekonomi Dasar',body:'Permintaan, penawaran, dan pasar',
+     materi:'<h3>📈 Ekonomi Dasar</h3><p><b>Permintaan</b> = jumlah barang yang ingin dan mampu dibeli. Hukumnya: harga naik → jumlah yang diminta turun (berbanding terbalik).</p><p><b>Penawaran</b> = jumlah barang yang ingin dijual penjual. Harga naik → penawaran naik (berbanding lurus).</p><p><b>Titik keseimbangan pasar</b> adalah harga saat permintaan = penawaran. Faktor penggeser permintaan: pendapatan, selera, harga barang lain. <b>Inflasi</b> = kenaikan harga barang secara terus-menerus, mengurangi daya beli uang.</p>',
+     quiz:[
+      {q:'Menurut hukum permintaan, jika harga naik maka…',o:['Permintaan naik','Permintaan turun','Permintaan tetap','Penjual hilang'],a:1},
+      {q:'Inflasi berarti…',o:['Kenaikan harga umum terus-menerus','Harga turun','Uang bertambah kuat','Barang berkurang'],a:0},
+      {q:'Harga keseimbangan terjadi saat…',o:['Permintaan > penawaran','Penawaran > permintaan','Permintaan = penawaran','Tidak ada pembeli'],a:2},
+      {q:'Jika harga naik, menurut hukum penawaran penjual akan…',o:['Menambah penawaran','Mengurangi penawaran','Berhenti total','Menurunkan harga bahan'],a:0},
+      {q:'Kenaikan pendapatan konsumen umumnya…',o:['Menggeser permintaan naik','Menggeser permintaan turun','Tidak berpengaruh','Mematikan pasar'],a:0}]}
+  ]},
+  skill:{icon:'🛠',name:'Kelas Skill',desc:'Skill praktis untuk kerja dan kehidupan',mods:[
+    {id:'sk-dig',icon:'📱',title:'Literasi Digital',body:'Internet aman dan produktif',
+     materi:'<h3>📱 Literasi Digital</h3><p><b>Keamanan sandi:</b> gunakan minimal 12 karakter campuran huruf, angka, simbol. Jangan pakai tanggal lahir. Gunakan sandi berbeda tiap akun.</p><p><b>Kenali penipuan:</b> tautan minta login via WA = hampir pasti phishing. Cek alamat situs dengan teliti. Hadiah GRATIS yang minta data pribadi adalah umpan.</p><p><b>Etika digital:</b> jaga jejak digital — yang diunggah internet tidak pernah benar-benar hilang. Verifikasi berita sebelum membagikan (cek sumber, tanggal, penulis).</p>',
+     quiz:[
+      {q:'Ciri utama phishing adalah…',o:['Tautan meminta login/data pribadi','Desain web menarik','Halaman berat','Bahasa Indonesia'],a:0},
+      {q:'Sandi paling kuat…',o:['123456','Tgl lahir','12 karakter campuran unik per akun','Nama sendiri'],a:2},
+      {q:'Sebelum membagikan berita, sebaiknya…',o:['Langsung bagikan','Verifikasi sumber dan tanggalnya','Tunggu 5 menit','Bagikan ke 1 grup dulu'],a:1},
+      {q:'Jejak digital artinya…',o:['Sisa file sementara','Apa yang kita unggah sulit hilang dari internet','Kuota internet','Riwayat keyboard'],a:1},
+      {q:'"Menangkan iPhone gratis, isi data!" sebaiknya…',o:['Diisi cepat','Dibagikan','Diabaikan — hampir pasti penipuan','Ditanyakan ke penjual'],a:2}]},
+    {id:'sk-fin',icon:'💰',title:'Keuangan Dasar',body:'Mengelola uang pribadi',
+     materi:'<h3>💰 Keuangan Dasar</h3><p><b>Cicilan 50/30/20:</b> 50% kebutuhan pokok, 30% keinginan, 20% tabungan/investasi.</p><p><b>Dana darurat:</b> simpan setara 3–6 bulan pengeluaran. Ia menjadi bantalan saat kehilangan pekerjaan atau sakit.</p><p><b>Utang sehat:</b> total cicilan maksimal 30% penghasilan. Hindari utang konsumtif (gaya hidup); utang produktif (modal usaha) boleh bila terukur.</p><p><b>Bunga pinjaman online:</b> hitung biaya total, bukan cicilan bulanan. Pinjol ilegal = tanpa izin OJK, tagih dengan ancaman — laporkan.</p>',
+     quiz:[
+      {q:'Dana darurat ideal setara…',o:['1 bulan pengeluaran','3–6 bulan pengeluaran','1 tahun gaji','Tidak perlu'],a:1},
+      {q:'Porsi cicilan maksimal dari penghasilan…',o:['10%','30%','60%','80%'],a:1},
+      {q:'Aturan 50/30/20 membagi penghasilan untuk…',o:['Kebutuhan, keinginan, tabungan','Utang, makan, pakaian','Investasi, cicilan, judi','Sedekah, tabungan, utang'],a:0},
+      {q:'Pinjol legal di Indonesia harus punya izin…',o:['Kelurahan','OJK','Kemenkes','BNN'],a:1},
+      {q:'Contoh utang produktif adalah…',o:['Cicilan pesta','Gadget baru bergaya','Modal usaha terukur','Liburan mewah'],a:2}]},
+    {id:'sk-com',icon:'🗣',title:'Komunikasi Efektif',body:'Berbicara, mendengar, dan presentasi',
+     materi:'<h3>🗣 Komunikasi Efektif</h3><p><b>Pendengar aktif:</b> fokus penuh pada pembicara, jangan menyusun balasan saat orang masih bicara. Ringkas ulang: "Jadi intinya…" untuk memastikan paham.</p><p><b>Struktur berbicara jelas:</b> kesimpulan dulu, detail kemudian. "Saya setuju, karena tiga alasan…" lebih mudah diikuti daripada bertele-tele.</p><p><b>Bahasa tubuh:</b> kontak mata, postur terbuka, tidak menyilangkan tangan. 55% kesan komunikasi dari bahasa tubuh, bukan kata.</p>',
+     quiz:[
+      {q:'Pendengar aktif berarti…',o:['Menunggu giliran bicara sambil berpikir balasan','Fokus penuh lalu meringkas ulang','Menyela cepat','Diam total'],a:1},
+      {q:'Cara menyampaikan gagasan paling jelas…',o:['Kesimpulan dulu, lalu rincian alasan','Rincian dulu 20 menit baru inti','Pakai istilah sulit','Bertele-tele'],a:0},
+      {q:'Postur saat komunikasi yang baik…',o:['Menyilang tangan','Terbuka dan kontak mata','Membelakangi','Melihat ponsel'],a:1},
+      {q:'"Jadi intinya…" dipakai untuk…',o:['Memastikan pemahaman','Memotong bicara','Menghina','Mengakhiri pertemanan'],a:0},
+      {q:'Kesan komunikasi paling besar berasal dari…',o:['Kata-kata saja','Bahasa tubuh','Volume suara','Kecepatan bicara'],a:1}]}
+  ]}
+};
+const PASS = 70; // nilai minimal tiap kuis (%)
+// ================== STATE ==================
+const KEY='mv_v1';
+let S={name:'',city:'',done:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||'{}');S=Object.assign(S,s);}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+let curProg=null,curMod=null,answers={};
+
+// ================== NAV ==================
+const $=id=>document.getElementById(id);
+function go(p){document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+  $('p-'+p).classList.add('on');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('on'));
+  const nb=$('nv-'+p); if(nb)nb.classList.add('on');
+  window.scrollTo(0,0);}
+
+// ================== RENDER ==================
+function renderHome(){
+  let h='';
+  for(const k in PROG){
+    const p=PROG[k],tot=p.mods.length,done=p.mods.filter(m=>S.done[m.id]&&S.done[m.id].score>=PASS).length;
+    h+=`<div class="prog" onclick="openProg('${k}')"><div class="ic">${p.icon}</div><h3>${p.name}</h3><p>${p.desc}</p><span class="nmod">${done}/${tot} modul selesai</span></div>`;
+  }
+  $('progGrid').innerHTML=h;
+  const all=[],dn=[];
+  for(const k in PROG)PROG[k].mods.forEach(m=>{all.push(m.id);if(S.done[m.id]&&S.done[m.id].score>=PASS)dn.push(m.id)});
+  const pct=Math.round(dn.length/all.length*100);
+  $('pbBar').style.width=pct+'%';
+  $('pbTxt').textContent=`Keseluruhan: ${dn.length} dari ${all.length} modul lulus (${pct}%)`;
+}
+function openProg(k){
+  curProg=k;const p=PROG[k];
+  $('modTitle').textContent=p.icon+' '+p.name;
+  $('modDesc').textContent=p.desc+' — lulus semua kuis (nilai ≥ '+PASS+') untuk membuka sertifikat.';
+  let h='';
+  p.mods.forEach((m,i)=>{
+    const d=S.done[m.id];
+    const stat=d?(d.score>=PASS?`<span class="stat st-pass">✓ ${d.score}</span>`:`<span class="stat st-try">⟳ ${d.score}</span>`):`<span class="stat st-try">Belum</span>`;
+    h+=`<div class="mod" onclick="openMod(${i})"><div class="mi">${m.icon}</div><div class="mb"><h4>${m.title}</h4><p>${m.body}</p></div>${stat}</div>`;
+  });
+  $('modList').innerHTML=h;
+  const ok=p.mods.every(m=>S.done[m.id]&&S.done[m.id].score>=PASS);
+  const btn=$('btnCert');
+  btn.disabled=!ok;
+  btn.textContent=ok?'🎓 Ambil Sertifikat':'🔒 Selesaikan semua kuis untuk sertifikat';
+  go('mods');
+}
+function openMod(i){
+  curMod=PROG[curProg].mods[i];answers={};
+  $('materiBox').innerHTML=curMod.materi;
+  let h='';
+  curMod.quiz.forEach((q,qi)=>{
+    h+=`<div class="q"><h4>${qi+1}. ${q.q}</h4>`;
+    q.o.forEach((o,oi)=>{h+=`<button class="opt" id="o${qi}_${oi}" onclick="pick(${qi},${oi})">${String.fromCharCode(65+oi)}. ${o}</button>`});
+    h+='</div>';
+  });
+  $('quizBox').innerHTML=h;
+  $('scoreBox').innerHTML='';
+  $('btnSubmit').disabled=false;
+  go('learn');
+}
+function pick(qi,oi){
+  answers[qi]=oi;
+  for(let j=0;j<4;j++){const el=$('o'+qi+'_'+j);if(el)el.classList.remove('sel')}
+  $('o'+qi+'_'+oi).classList.add('sel');
+}
+function submitQuiz(){
+  const n=curMod.quiz.length;
+  if(Object.keys(answers).length<n){alert('Jawab semua '+n+' pertanyaan dulu ya.');return}
+  let c=0;curMod.quiz.forEach((q,qi)=>{if(answers[qi]===q.a)c++});
+  const score=Math.round(c/n*100);
+  const pass=score>=PASS;
+  S.done[curMod.id]={score:score,date:new Date().toISOString().slice(0,10)};
+  if(pass&&S.done[curMod.id].first===undefined){/*tetap*/}
+  save();
+  $('scoreBox').innerHTML=`<div class="score"><div class="big" style="color:${pass?'#00d4aa':'#f5c518'}">${score}</div>
+    <div>${pass?'✅ LULUS — modul ini selesai!':'⟳ Belum lulus. Baca ulang materi, lalu coba lagi — tidak ada batas percobaan.'}</div>
+    <div style="margin-top:12px"><button class="btn alt" onclick="go('mods')">‹ Kembali ke daftar modul</button></div></div>`;
+  $('btnSubmit').disabled=true;
+  renderHome();
+}
+// ================== SERTIFIKAT ==================
+function certReady(progKey){
+  const p=PROG[progKey];
+  return p.mods.every(m=>S.done[m.id]&&S.done[m.id].score>=PASS);
+}
+function openCert(){
+  go('cert');
+  const anyReady=['sd','smp','sma','skill'].filter(certReady);
+  $('certForm').style.display=anyReady.length?'block':'none';
+  if(!anyReady.length){
+    $('certForm').innerHTML='<h3>🎓 Sertifikat</h3><p>Kamu belum menyelesaikan satu paket pun. Lulus semua kuis satu program (SD / SMP / SMA / Skill) untuk membuka sertifikat.</p>';
+    return;
+  }
+  let sel='';
+  anyReady.forEach((k,i)=>{
+    const p=PROG[k];
+    sel+=`<label class="lbl"><input type="radio" name="cp" value="${k}" ${i===0?'checked':''}> ${p.icon} ${p.name}</label>`;
+  });
+  $('certForm').innerHTML=`<h3>🎓 Sertifikat Penyelesaian</h3>
+    <p>Pilih program yang sudah kamu lulus:</p>${sel}
+    <label class="lbl">Nama lengkap</label><input class="txt" id="cName" maxlength="40" value="${S.name?S.name.replace(/"/g,'&quot;'):''}">
+    <label class="lbl">Asal kota (opsional)</label><input class="txt" id="cCity" maxlength="40">
+    <div style="margin-top:14px"><button class="btn" onclick="makeCert()">Buat Sertifikat</button></div>`;
+}
+function makeCert(){
+  const pk=document.querySelector('input[name="cp"]:checked');
+  const name=($('cName').value||'').trim();
+  if(!pk){alert('Pilih program.');return}
+  if(!name){alert('Isi nama lengkap.');return}
+  const city=($('cCity').value||'').trim();
+  S.name=name;S.city=city;save();
+  const p=PROG[pk.value];
+  const tgl=new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'});
+  // kode verifikasi sederhana
+  let h1=0;const src=name+'|'+p.name+'|'+tgl;
+  for(let i=0;i<src.length;i++){h1=((h1<<5)-h1+src.charCodeAt(i))|0}
+  const kode='DL-MV-'+Math.abs(h1).toString(36).toUpperCase().slice(0,8);
+  $('crtNama').textContent=name;
+  $('crtBody').innerHTML=`telah menyelesaikan program pembelajaran jarak jauh<br><b>${p.name}</b> (${p.mods.length} modul)${city?'<br>Asal: '+city:''}<br>dengan capaian kuis memuaskan pada Maestro Vokasi.`;
+  $('certForm').querySelector('.foot');
+  const foot=$('certArea');
+  $('crtKode').textContent='Kode Verifikasi: '+kode+' · Diterbitkan: '+tgl;
+  $('certForm').style.display='none';
+  $('certArea').style.display='block';
+}
+renderHome();
+</script>
 </body>
 </html>
