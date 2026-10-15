@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://whtsromktkymksuvagrw.supabase.co; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#0D0D0D">
 <title>Maestro Vokasi — Dharma Labs</title>
@@ -80,6 +81,7 @@ nav button .ni{display:block;font-size:19px}
 .badge-demo{font-size:9px;background:#26210f;color:var(--gold2);border-radius:8px;padding:1px 6px;margin-left:4px}
 .rrow{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px;font-size:13px}
 .rrow b{float:right}
+.saybar{margin:8px 0}.say{background:#1a1a1a;border:1px solid var(--gold,#d4a017);color:inherit;border-radius:10px;padding:6px 10px;margin:2px 4px 2px 0;font:inherit;cursor:pointer}
 </style>
 </head>
 <body>
@@ -509,11 +511,11 @@ function makeCert(){
       if (r && r.ok) {
         $('crtKode').textContent = 'Kode Verifikasi: ' + r.code + ' · Diterbitkan: ' + tgl;
       } else {
-        $('crtKode').textContent = 'Kode (lokal): ' + kode + ' · ' + tgl + ' — perangkat offline, kode server belum terbit';
+        $('crtKode').textContent = '⚠️ BELUM RESMI — kode lokal ' + kode + ' tidak dapat diverifikasi. Sambungkan internet lalu terbitkan ulang untuk mendapat kode resmi.';
       }
     })
     .catch(function () {
-      $('crtKode').textContent = 'Kode (lokal): ' + kode + ' · ' + tgl + ' — perangkat offline, kode server belum terbit';
+      $('crtKode').textContent = '⚠️ BELUM RESMI — kode lokal ' + kode + ' tidak dapat diverifikasi. Sambungkan internet lalu terbitkan ulang untuk mendapat kode resmi.';
     });
 }
 function verifyCert() {
@@ -665,11 +667,21 @@ function searchKur(q){
   const r=KUR.filter(u=>(u.judul+' '+u.mapel+' '+(u.level||'')+' kelas'+u.kelas).toLowerCase().indexOf(q.toLowerCase())>=0).slice(0,12);
   out.innerHTML=r.map(unitRow).join('')||'<p class="small">Tidak ditemukan.</p>';
 }
+// Tombol pengucapan (TTS): frasa diambil dari pola ketat say('teks','kode-bahasa') pada data mentah.
+// Tombol dibuat lewat DOM dengan textContent + data-*; atribut onclick TIDAK pernah lolos sanitasi.
+function sayButtons(raw){
+  var re=/say\('([^'<>\\]{1,80})','([a-z]{2}-[A-Z]{2})'\)/g,m,seen={},h='';
+  while((m=re.exec(String(raw||'')))){
+    var k=m[1]+'|'+m[2];if(seen[k])continue;seen[k]=1;
+    h+='<button class="say" type="button" data-say="'+E(m[1])+'" data-lang="'+E(m[2])+'">🔊 '+E(m[1])+'</button> ';
+  }
+  return h?'<p class="saybar">'+h+'</p>':'';
+}
 function openUnit(id){
   const u=KUR.find(x=>x.id===id);if(!u)return;
   if(!u.materi||!u.soal||!u.soal.length){alert('Materi unit ini belum tersedia — ditambahkan melalui panel admin.');return}
   kurAns={};curUnit=u;S.last=id;save();renderHome();
-  $('kurMateri').innerHTML='<h3>'+E(u.judul)+'</h3>'+(u.status==='demo'?'<p style="font-size:11px;color:var(--gold2)">⚠️ Materi demonstrasi — belum tervalidasi resmi.</p>':'')+cleanHTML(u.materi);
+  $('kurMateri').innerHTML='<h3>'+E(u.judul)+'</h3>'+(u.status==='demo'?'<p style="font-size:11px;color:var(--gold2)">⚠️ Materi demonstrasi — belum tervalidasi resmi.</p>':'')+cleanHTML(u.materi)+sayButtons(u.materi);
   let h='';
   u.soal.forEach((q,qi)=>{
     h+='<div class="q"><h4>'+(qi+1)+'. '+E(q.q)+'</h4>';
@@ -759,7 +771,8 @@ pullSync();
 loadKur();
 // Delegasi klik: ID unit dibaca dari atribut data-* (bukan disisipkan ke kode handler).
 document.addEventListener('click',function(ev){
-  var t=ev.target.closest?ev.target.closest('[data-open],[data-fav]'):null;if(!t)return;
+  var t=ev.target.closest?ev.target.closest('[data-open],[data-fav],[data-say]'):null;if(!t)return;
+  if(t.hasAttribute('data-say')){var L=t.getAttribute('data-lang')||'';if(/^[a-z]{2}-[A-Z]{2}$/.test(L))say(t.getAttribute('data-say'),L);return}
   if(t.hasAttribute('data-fav')){favToggle(t.getAttribute('data-fav'));return}
   openUnit(t.getAttribute('data-open'));
 });
