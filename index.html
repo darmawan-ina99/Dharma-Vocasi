@@ -7,6 +7,7 @@
 <meta name="theme-color" content="#4F46E5">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
 <title>Maestro Vokasi — Dharma-Labs Digital</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Playfair+Display:wght@600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
@@ -749,10 +750,10 @@ const VOCS=[
  {id:'cyber',nm:'Cybersecurity Dasar'},{id:'usaha',nm:'Kewirausahaan'}];
 function loadKur(){
   mvRpc('mv_kur_get',{p_app:MV.app}).then(function(d){
-    if(Array.isArray(d)&&d.length){KUR=d.filter(function(u){return u&&typeof u==='object'&&typeof u.id==='string'});try{localStorage.setItem('mv_kur_cache',JSON.stringify({ts:Date.now(),units:d}))}catch(e){}
+    if(Array.isArray(d)&&d.length){KUR=d.filter(function(u){return u&&typeof u==='object'&&typeof u.id==='string'&&u.reviewed===true});try{localStorage.setItem('mv_kur_cache',JSON.stringify({ts:Date.now(),units:KUR}))}catch(e){}
       renderCatalog();renderRapor();}
   }).catch(function(){
-    try{KUR=JSON.parse(localStorage.getItem('mv_kur_cache')||'{}').units}catch(e){}
+    try{KUR=(JSON.parse(localStorage.getItem('mv_kur_cache')||'{}').units||[]).filter(function(u){return u&&u.reviewed===true})}catch(e){KUR=[]}
     if(KUR){renderCatalog();renderRapor()}
   });
 }
@@ -959,6 +960,7 @@ function placePick(oi){
 renderHome();
 pullSync();
 loadKur();
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('service-worker.js').catch(function(){})})}
 // Delegasi klik: ID unit dibaca dari atribut data-* (bukan disisipkan ke kode handler).
 document.addEventListener('click',function(ev){
   var t=ev.target.closest?ev.target.closest('[data-open],[data-fav],[data-say]'):null;if(!t)return;
