@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>Maestro Vokasi — Dharma-Labs Digital</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Playfair+Display:wght@600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
 /* ===== DESIGN SYSTEM: Modern Educational (Modern SaaS + Premium Minimalist) ===== */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -123,15 +123,63 @@ button:focus-visible,input:focus-visible,.prog:focus-visible{outline:3px solid r
 input.txt{width:100%;background:#fff;border:1.5px solid #D5DBF5;border-radius:var(--r-md);color:var(--txt);padding:14px;font-size:15px;font-family:inherit;outline:none;min-height:48px;transition:border-color .15s,box-shadow .15s}
 input.txt:focus{border-color:var(--pri);box-shadow:0 0 0 4px rgba(79,70,229,.14)}
 label.lbl{display:block;font-size:13px;font-weight:600;color:var(--dim);margin:12px 0 6px}
-/* ===== sertifikat ===== */
-.cert{background:#FFFEF8;color:#1a1a1a;border:10px double #C9A227;border-radius:8px;padding:28px 20px;text-align:center;font-family:Georgia,'Times New Roman',serif;box-shadow:var(--sh-2)}
-.cert .cl{font-size:11px;letter-spacing:4px;color:#8a6d1a}
-.cert h1{font-family:Syne,sans-serif;font-size:24px;margin:6px 0 2px;color:#14183A}
-.cert .nama{font-size:26px;font-weight:700;margin:16px 0 6px;font-family:Syne,sans-serif;border-bottom:2px solid #C9A227;display:inline-block;padding:0 14px 4px}
-.cert .body{font-size:14px;margin:12px 0;color:#333}
-.cert .seal{width:74px;height:74px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe28a,#C9A227);color:#3a2b00;display:inline-flex;align-items:center;justify-content:center;font-family:Syne,sans-serif;font-weight:800;font-size:22px;margin-top:12px;box-shadow:0 4px 12px rgba(0,0,0,.2)}
-.cert .foot{font-size:11px;color:#555;margin-top:14px}
-.cert .kode{font-size:12px;color:#8a6d1a;font-weight:700;letter-spacing:1px}
+
+/* ===== SERTIFIKAT FORMAL ===== */
+.cert-wrap{container-type:inline-size;width:100%}
+.cert{--gold:#B08A2E;--gold2:#D9B85C;--navy:#14183A;position:relative;background:
+ radial-gradient(circle at 50% 0,#FFFDF5 0,#FBF6E6 70%,#F6EFD8 100%);color:var(--navy);
+ border:2px solid var(--gold);outline:6px solid #FBF6E6;outline-offset:-10px;box-shadow:inset 0 0 0 9px #FBF6E6,inset 0 0 0 10.5px var(--gold),0 18px 40px rgba(20,24,58,.22);
+ padding:26px 16px 16px;text-align:center;font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;overflow:hidden;border-radius:4px}
+.cert .c{position:absolute;width:15%;max-width:74px;color:var(--gold);z-index:2}
+.cert .c .co{display:block;width:100%;height:auto}
+.cert .tl{top:14px;left:14px}.cert .tr{top:14px;right:14px;transform:scaleX(-1)}
+.cert .bl{bottom:14px;left:14px;transform:scaleY(-1)}.cert .br{bottom:14px;right:14px;transform:scale(-1,-1)}
+.cert .cert-water{position:absolute;left:50%;top:50%;width:62%;transform:translate(-50%,-50%);opacity:.055;pointer-events:none;z-index:0}
+.cert .cert-in{position:relative;z-index:1;padding:4px 5%}
+.cert .cert-logo{display:block;margin:0 auto 4px;width:30%;max-width:130px;height:auto}
+.cert .cert-kicker{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(7.5px,2.2cqw,11px);letter-spacing:.28em;font-weight:700;color:#6B5316}
+.cert .cert-title{font-family:'Playfair Display',Georgia,serif;font-weight:800;font-size:clamp(24px,8.6cqw,58px);letter-spacing:.1em;line-height:1.1;margin:8px 0 2px;white-space:nowrap;color:var(--navy);
+ background:linear-gradient(180deg,#14183A 30%,#3a3f78);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-indent:.1em}
+.cert .cert-sub{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(8.5px,2.5cqw,13px);letter-spacing:.42em;font-weight:700;color:var(--gold);text-indent:.42em}
+.cert .cert-rule{display:flex;align-items:center;gap:10px;margin:8px auto 6px;max-width:62%}
+.cert .cert-rule i{flex:1;height:1.5px;background:linear-gradient(90deg,transparent,var(--gold))}
+.cert .cert-rule i:last-child{background:linear-gradient(270deg,transparent,var(--gold))}
+.cert .cert-rule b{color:var(--gold);font-size:11px}
+.cert .body{font-size:clamp(13px,3.7cqw,19px);line-height:1.55;color:#2c2f55;margin:6px 0;font-weight:500}
+.cert .body.pre{font-style:italic;color:#555a85}
+.cert .body b{font-weight:700;color:var(--navy)}
+.cert .nama{font-family:'Great Vibes','Playfair Display',cursive;font-size:var(--nf,clamp(28px,9.5cqw,60px));line-height:1.2;font-weight:400;color:#14183A;margin:4px auto 6px;
+ display:block;max-width:94%;padding:0 3% 2px;border-bottom:1.5px solid var(--gold);white-space:nowrap;overflow:hidden}
+.cert .cert-sign{display:flex;align-items:flex-end;justify-content:space-between;gap:6px;margin:14px 0 8px}
+.cert .cert-sign>div:not(.seal){flex:1;font-size:clamp(9px,2.6cqw,13px)}
+.cert .cert-sign .line{height:1.5px;background:var(--navy);opacity:.55;margin:0 8% 6px}
+.cert .cert-sign b{display:block;font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(9px,2.5cqw,12.5px);font-weight:700}
+.cert .cert-sign span{color:#5b6385;font-size:clamp(9px,2.5cqw,12.5px)}
+.cert .seal{flex:none;width:clamp(66px,20cqw,110px);height:clamp(66px,20cqw,110px);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0;gap:2px;
+ background:radial-gradient(circle at 50% 35%,#FFFFFF 0,#FFFDF5 70%,#F6EFD8 100%);color:#6B5316;
+ border:2.5px solid var(--gold);box-shadow:0 5px 14px rgba(120,86,10,.32),0 0 0 4px #FBF6E6,0 0 0 5.5px var(--gold2),inset 0 0 0 2.5px #FBF6E6,inset 0 0 0 3.5px rgba(176,138,46,.55)}
+.cert .seal img{width:56%;height:auto;display:block}
+.cert .seal small{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(5.5px,1.55cqw,8.5px);letter-spacing:.22em;font-weight:800;text-indent:.22em}
+.cert .kode{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(8.5px,2.4cqw,12px);color:#6B5316;font-weight:700;letter-spacing:.06em;margin:8px 0 6px;word-break:break-word}
+.cert .cert-note{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(7.5px,2.05cqw,10px);line-height:1.5;color:#6a6f93;max-width:88%;margin:6px auto 0;border-top:1px solid rgba(176,138,46,.4);padding-top:8px}
+.cert .foot{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(7.5px,2cqw,10px);color:#8a8fb0;margin-top:6px}
+@media print{@page{size:A4 landscape;margin:6mm}
+ html,body{background:#fff!important;padding:0!important;margin:0!important;height:auto!important}
+ .wrap{max-width:none!important;padding:0!important}
+ header,nav,.ticker,.noprint,.back{display:none!important}
+ .page,#p-cert{padding:0!important;margin:0!important}
+ .cert-wrap{width:100%;container-type:normal}
+ .cert{box-shadow:none!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;width:285mm!important;height:198mm!important;max-width:none!important;margin:0 auto;padding:7mm 12mm 6mm!important;page-break-inside:avoid;break-inside:avoid;display:flex;flex-direction:column;justify-content:center;font-size:13px}
+ .cert .cert-in{padding:0 8%}
+ .cert .c{width:20mm}
+ .cert .cert-logo{width:34mm;max-width:none;margin-bottom:1mm}
+ .cert .cert-kicker{font-size:9px}.cert .cert-title{font-size:44px;margin:2mm 0 0}.cert .cert-sub{font-size:10px}
+ .cert .cert-rule{margin:3mm auto 2mm}
+ .cert .body{font-size:15px;margin:1.5mm 0}
+ .cert .nama{font-size:var(--nfp,46px)!important;margin:1mm auto 2mm}
+ .cert .cert-sign{margin:5mm 0 3mm}.cert .cert-sign b,.cert .cert-sign span{font-size:11px}
+ .cert .seal{width:27mm;height:27mm}.cert .seal small{font-size:7px}
+ .cert .kode{font-size:10.5px;margin:2mm 0}.cert .cert-note{font-size:8.5px;margin-top:2mm;padding-top:2mm}.cert .foot{font-size:8.5px;margin-top:1mm}}
 @media print{body:before{display:none}body *{visibility:hidden}#certArea,#certArea *{visibility:visible}#certArea{position:absolute;left:0;top:0;width:100%}.noprint{display:none}}
 /* ===== navigasi bawah (floating) ===== */
 nav{position:fixed;left:50%;transform:translateX(-50%);bottom:max(12px,env(safe-area-inset-bottom));width:min(calc(100% - 24px),560px);display:flex;z-index:30;padding:6px;
@@ -158,7 +206,6 @@ nav button .ni svg{width:22px;height:22px}
 /* ===== logo ===== */
 header .brand{height:36px;width:auto;flex:none;object-fit:contain;filter:drop-shadow(0 2px 4px rgba(37,99,235,.25))}
 .hero .hero-logo{position:absolute;right:18px;top:18px;height:50px;width:auto;opacity:.95;z-index:1}
-.cert .cert-logo{display:block;margin:0 auto 6px;max-width:170px;height:auto}
 .foot-brand{display:flex;align-items:center;justify-content:center;gap:10px;margin:28px 0 8px;color:var(--dim);font-size:12px}
 .foot-brand img{height:34px;width:auto}
 
@@ -259,16 +306,28 @@ header .logo{font-size:18px}
     <div style="margin-top:14px"><button class="btn" onclick="makeCert()">Buat Sertifikat</button></div>
   </div>
   <div id="certArea" style="display:none">
-    <div class="cert">
-      <img class="cert-logo" src="logo-dharma-labs.png" alt="Dharma-Labs Digital" width="170">
-      <h1>SERTIFIKAT NON-FORMAL</h1>
-      <div class="body">Diberikan kepada</div>
-      <div class="nama" id="crtNama"></div>
-      <div class="body" id="crtBody"></div>
-      <div class="seal">DL</div>
-      <div class="foot">Diterbitkan oleh <b>Dharma Labs Digital</b> — Program Pembelajaran Jarak Jauh Maestro Vokasi<br>Kontak: 0851-5116-4342</div>
-      <div class="kode" id="crtKode"></div>
-    </div>
+    <div class="cert-wrap"><div class="cert" id="certSheet">
+      <span class="c tl"><svg class="co" viewBox="0 0 60 60" aria-hidden="true"><path d="M2 58V14C2 7 7 2 14 2h44" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M10 58V20c0-6 4-10 10-10h38" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="14" cy="14" r="3.2" fill="currentColor"/></svg></span><span class="c tr"><svg class="co" viewBox="0 0 60 60" aria-hidden="true"><path d="M2 58V14C2 7 7 2 14 2h44" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M10 58V20c0-6 4-10 10-10h38" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="14" cy="14" r="3.2" fill="currentColor"/></svg></span><span class="c bl"><svg class="co" viewBox="0 0 60 60" aria-hidden="true"><path d="M2 58V14C2 7 7 2 14 2h44" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M10 58V20c0-6 4-10 10-10h38" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="14" cy="14" r="3.2" fill="currentColor"/></svg></span><span class="c br"><svg class="co" viewBox="0 0 60 60" aria-hidden="true"><path d="M2 58V14C2 7 7 2 14 2h44" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M10 58V20c0-6 4-10 10-10h38" fill="none" stroke="currentColor" stroke-width="1"/><circle cx="14" cy="14" r="3.2" fill="currentColor"/></svg></span>
+      <img class="cert-water" src="logo-icon.png" alt="" aria-hidden="true">
+      <div class="cert-in">
+        <img class="cert-logo" src="logo-dharma-labs.png" alt="Dharma-Labs Digital" width="150">
+        <div class="cert-kicker">MAESTRO VOKASI · PEMBELAJARAN JARAK JAUH</div>
+        <h1 class="cert-title">SERTIFIKAT</h1>
+        <div class="cert-sub">PENYELESAIAN PROGRAM</div>
+        <div class="cert-rule"><i></i><b>◆</b><i></i></div>
+        <div class="body pre">Dengan ini menyatakan bahwa</div>
+        <div class="nama" id="crtNama"></div>
+        <div class="body" id="crtBody"></div>
+        <div class="cert-sign">
+          <div><div class="line"></div><b>Direktur Program</b><span>Dharma-Labs Digital</span></div>
+          <div class="seal" aria-label="Segel resmi Dharma-Labs"><img src="logo-icon.png" alt="Logo Dharma-Labs"><small>OFFICIAL</small></div>
+          <div><div class="line"></div><b>Penyelenggara</b><span>Maestro Vokasi</span></div>
+        </div>
+        <div class="kode" id="crtKode"></div>
+        <div class="cert-note">Sertifikat Non-Formal. Diterbitkan secara internal oleh Dharma-Labs Digital dan bukan merupakan ijazah atau sertifikasi resmi negara. Keaslian dapat diperiksa pada menu Verifikasi.</div>
+        <div class="foot">Dharma-Labs Digital · IT Solutions &amp; Innovation · Kontak: 0851-5116-4342</div>
+      </div>
+    </div></div>
     <div class="noprint" style="margin-top:14px">
       <button class="btn" onclick="window.print()">🖨 Cetak / Simpan PDF</button>
     </div>
@@ -611,6 +670,11 @@ function openCert(){
     <label class="lbl">Asal kota (opsional)</label><input class="txt" id="cCity" maxlength="40">
     <div style="margin-top:14px"><button class="btn" onclick="makeCert()">Buat Sertifikat</button></div>`;
 }
+
+function fitCertName(){var n=document.getElementById('crtNama');if(!n)return;n.style.removeProperty('--nf');
+  var base=parseFloat(getComputedStyle(n).fontSize),avail=n.clientWidth-2,w=n.scrollWidth;
+  if(w>avail){n.style.setProperty('--nf',Math.max(14,Math.floor(base*avail/w*0.97))+'px')}}
+window.addEventListener('resize',function(){try{fitCertName()}catch(e){}});
 function makeCert(){
   const pk=document.querySelector('input[name="cp"]:checked');
   const name=($('cName').value||'').trim();
@@ -630,6 +694,7 @@ function makeCert(){
   const foot=$('certArea');
   $('certForm').style.display='none';
   $('certArea').style.display='block';
+  try{fitCertName();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){fitCertName()})}catch(e){}
   $('crtKode').textContent='Menerbitkan sertifikat…';
   mvRpc('mv_issue', { p_app: MV.app, p_key: MV.dk, p_program: pk.value })
     .then(function (r) {
