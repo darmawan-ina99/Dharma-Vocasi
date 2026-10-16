@@ -74,6 +74,8 @@ button:focus-visible{outline:3px solid rgba(79,70,229,.45);outline-offset:2px}
     </div>
     <label>Judul</label><input id="uJudul">
     <label>Materi (HTML sederhana)</label><textarea id="uMateri"></textarea>
+    <label>Sumber / referensi</label><input id="uSumber" placeholder="URL atau keterangan sumber">
+    <label>Spiral of / unit rujukan (opsional)</label><input id="uSpiral" placeholder="ID unit sebelumnya, mis. k3-mat-s2-1">
     <label>Soal — format JSON array: [{"q":"soal","o":["a","b","c","d"],"a":1,"p":"pembahasan"}]</label>
     <textarea id="uSoal" placeholder='[{"q":"1+1=?","o":["1","2","3","4"],"a":1,"p":"penjumlahan dasar"}]'></textarea>
     <label>Status</label>
@@ -125,7 +127,7 @@ function fill(u) {
   $('uId').value = u.id; $('uKelas').value = u.kelas || 0; $('uMapel').value = u.mapel;
   $('uTrack').value = u.track || 'sd'; $('uLevel').value = u.level || '';
   $('uSem').value = u.semester || 1; $('uJudul').value = u.judul;
-  $('uMateri').value = u.materi || ''; $('uSoal').value = JSON.stringify(u.soal || [], null, 1);
+  $('uMateri').value = u.materi || ''; $('uSumber').value = u.sumber || ''; $('uSpiral').value = u.spiral_of || ''; window._editingUnit = u; $('uSoal').value = JSON.stringify(u.soal || [], null, 1);
   $('uStatus').value = u.reviewed ? 'final' : 'demo';
   window.scrollTo(0, 0);
 }
@@ -137,7 +139,7 @@ async function saveUnit() {
     id: $('uId').value.trim(), track: $('uTrack').value, level: $('uLevel').value.trim(),
     kelas: (isNaN(parseInt($('uKelas').value)) ? 0 : parseInt($('uKelas').value)), semester: parseInt($('uSem').value),
     mapel: $('uMapel').value.trim(), judul: $('uJudul').value.trim(),
-    materi: $('uMateri').value, soal: soal,
+    materi: $('uMateri').value, sumber: $('uSumber').value.trim(), spiral_of: $('uSpiral').value.trim(), soal: soal,
     status: $('uStatus').value === 'final' ? 'final' : 'demo',
     reviewed: $('uStatus').value === 'final'
   };
