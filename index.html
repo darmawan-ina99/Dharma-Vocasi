@@ -748,13 +748,14 @@ const VOCS=[
  {id:'office',nm:'Digital Office'},{id:'desain',nm:'Desain Digital'},{id:'web',nm:'Web Development'},
  {id:'aicontent',nm:'AI Content Creator'},{id:'databisnis',nm:'Data & Bisnis'},{id:'digimark',nm:'Digital Marketing'},
  {id:'cyber',nm:'Cybersecurity Dasar'},{id:'usaha',nm:'Kewirausahaan'}];
+const MV_CACHE_MAX_AGE=86400000;
 function loadKur(){
   mvRpc('mv_kur_get',{p_app:MV.app}).then(function(d){
     if(Array.isArray(d)&&d.length){KUR=d.filter(function(u){return u&&typeof u==='object'&&typeof u.id==='string'&&u.reviewed===true});try{localStorage.setItem('mv_kur_cache',JSON.stringify({ts:Date.now(),units:KUR}))}catch(e){}
       renderCatalog();renderRapor();}
   }).catch(function(){
-    try{KUR=(JSON.parse(localStorage.getItem('mv_kur_cache')||'{}').units||[]).filter(function(u){return u&&u.reviewed===true})}catch(e){KUR=[]}
-    if(KUR){renderCatalog();renderRapor()}
+    try{var c=JSON.parse(localStorage.getItem('mv_kur_cache')||'{}');KUR=(Date.now()-(+c.ts||0)<=MV_CACHE_MAX_AGE?(c.units||[]):[]).filter(function(u){return u&&u.reviewed===true})}catch(e){KUR=[]}
+    if(KUR.length){renderCatalog();renderRapor()}else{$('catBody').textContent='Katalog offline belum tersedia atau cache sudah kedaluwarsa.'}
   });
 }
 function say(t,l){try{const u=new SpeechSynthesisUtterance(t);u.lang=l;u.rate=.85;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){}}
