@@ -155,11 +155,11 @@ label.lbl{display:block;font-size:13px;font-weight:600;color:var(--dim);margin:1
 .cert .cert-sign .line{height:1.5px;background:var(--navy);opacity:.55;margin:0 8% 6px}
 .cert .cert-sign b{display:block;font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(9px,2.5cqw,12.5px);font-weight:700}
 .cert .cert-sign span{color:#5b6385;font-size:clamp(9px,2.5cqw,12.5px)}
-.cert .seal{flex:none;width:clamp(62px,19cqw,104px);height:clamp(62px,19cqw,104px);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0;
- background:radial-gradient(circle at 35% 28%,#F8E6A6,#D9B85C 45%,#A87F22);color:#3a2b00;font-family:'Playfair Display',serif;font-weight:800;
- box-shadow:0 5px 14px rgba(120,86,10,.4),inset 0 0 0 4px rgba(255,255,255,.28),inset 0 0 0 6px rgba(120,86,10,.35)}
-.cert .seal span{font-size:clamp(20px,6.4cqw,34px);line-height:1}
-.cert .seal small{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(6px,1.7cqw,9px);letter-spacing:.2em;font-weight:800;margin-top:3px}
+.cert .seal{flex:none;width:clamp(66px,20cqw,110px);height:clamp(66px,20cqw,110px);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0;gap:2px;
+ background:radial-gradient(circle at 50% 35%,#FFFFFF 0,#FFFDF5 70%,#F6EFD8 100%);color:#6B5316;
+ border:2.5px solid var(--gold);box-shadow:0 5px 14px rgba(120,86,10,.32),0 0 0 4px #FBF6E6,0 0 0 5.5px var(--gold2),inset 0 0 0 2.5px #FBF6E6,inset 0 0 0 3.5px rgba(176,138,46,.55)}
+.cert .seal img{width:56%;height:auto;display:block}
+.cert .seal small{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(5.5px,1.55cqw,8.5px);letter-spacing:.22em;font-weight:800;text-indent:.22em}
 .cert .kode{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(8.5px,2.4cqw,12px);color:#6B5316;font-weight:700;letter-spacing:.06em;margin:8px 0 6px;word-break:break-word}
 .cert .cert-note{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(7.5px,2.05cqw,10px);line-height:1.5;color:#6a6f93;max-width:88%;margin:6px auto 0;border-top:1px solid rgba(176,138,46,.4);padding-top:8px}
 .cert .foot{font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(7.5px,2cqw,10px);color:#8a8fb0;margin-top:6px}
@@ -178,7 +178,7 @@ label.lbl{display:block;font-size:13px;font-weight:600;color:var(--dim);margin:1
  .cert .body{font-size:15px;margin:1.5mm 0}
  .cert .nama{font-size:var(--nfp,46px)!important;margin:1mm auto 2mm}
  .cert .cert-sign{margin:5mm 0 3mm}.cert .cert-sign b,.cert .cert-sign span{font-size:11px}
- .cert .seal{width:26mm;height:26mm}.cert .seal span{font-size:26px}.cert .seal small{font-size:7px}
+ .cert .seal{width:27mm;height:27mm}.cert .seal small{font-size:7px}
  .cert .kode{font-size:10.5px;margin:2mm 0}.cert .cert-note{font-size:8.5px;margin-top:2mm;padding-top:2mm}.cert .foot{font-size:8.5px;margin-top:1mm}}
 @media print{body:before{display:none}body *{visibility:hidden}#certArea,#certArea *{visibility:visible}#certArea{position:absolute;left:0;top:0;width:100%}.noprint{display:none}}
 /* ===== navigasi bawah (floating) ===== */
@@ -320,7 +320,7 @@ header .logo{font-size:18px}
         <div class="body" id="crtBody"></div>
         <div class="cert-sign">
           <div><div class="line"></div><b>Direktur Program</b><span>Dharma-Labs Digital</span></div>
-          <div class="seal" aria-label="Segel resmi"><span>DL</span><small>OFFICIAL</small></div>
+          <div class="seal" aria-label="Segel resmi Dharma-Labs"><img src="logo-icon.png" alt="Logo Dharma-Labs"><small>OFFICIAL</small></div>
           <div><div class="line"></div><b>Penyelenggara</b><span>Maestro Vokasi</span></div>
         </div>
         <div class="kode" id="crtKode"></div>
