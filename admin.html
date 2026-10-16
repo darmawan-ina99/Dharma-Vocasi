@@ -8,33 +8,36 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0D0D0D;--card:#16161d;--line:#2a2a33;--gold:#d4a017;--gold2:#f5c518;--acc:#00d4aa;--txt:#f0f0f5;--dim:#a6a6b8}
-body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',system-ui,sans-serif;line-height:1.6;padding:20px 14px 80px;max-width:680px;margin:0 auto}
-h1{font-family:Syne;font-size:22px;margin-bottom:2px}
+:root{--bg:#F5F7FF;--card:#FFFFFF;--line:#E3E8F5;--gold:#4F46E5;--gold2:#4F46E5;--acc:#0B9A8D;--txt:#14183A;--dim:#5B6385}
+body{background:var(--bg);color:var(--txt);font-family:'Plus Jakarta Sans',system-ui,sans-serif;line-height:1.6;padding:20px 14px 80px;max-width:680px;margin:0 auto;-webkit-font-smoothing:antialiased}
+.brandbar{display:flex;align-items:center;gap:12px;margin-bottom:14px}.brandbar img{height:38px;width:auto}
+h1{font-family:Syne,sans-serif;font-size:22px;margin-bottom:2px;letter-spacing:-.3px}
 .sub{color:var(--dim);font-size:12.5px;margin-bottom:18px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
-label{display:block;font-size:12px;color:var(--dim);margin:10px 0 5px}
-input,textarea,select{width:100%;background:#1d1d26;border:1.5px solid var(--line);border-radius:10px;color:var(--txt);padding:11px;font-size:14px;font-family:inherit}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 1px 2px rgba(20,24,58,.05),0 2px 8px rgba(20,24,58,.05)}
+label{display:block;font-size:12.5px;font-weight:600;color:var(--dim);margin:10px 0 5px}
+input,textarea,select{width:100%;background:#fff;border:1.5px solid #D5DBF5;border-radius:12px;color:var(--txt);padding:12px;font-size:14px;font-family:inherit;min-height:46px}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#4F46E5;box-shadow:0 0 0 4px rgba(79,70,229,.14)}
 textarea{min-height:120px;resize:vertical}
-.btn{width:100%;background:linear-gradient(135deg,#f5c518,#d4a017);color:#000;border:none;border-radius:12px;padding:13px;font-weight:700;font-size:15px;font-family:inherit;cursor:pointer;margin-top:12px}
-.btn.alt{background:transparent;border:1.5px solid var(--line);color:var(--txt)}
-.btn.red{background:transparent;border:1.5px solid #f87171;color:#f87171}
+.btn{width:100%;background:linear-gradient(135deg,#4F46E5,#6D5DF6);color:#fff;border:none;border-radius:12px;padding:13px;font-weight:700;font-size:15px;font-family:inherit;cursor:pointer;min-height:48px;box-shadow:0 8px 18px rgba(79,70,229,.3);margin-top:12px}
+.btn.alt{background:#fff;border:1.5px solid #CBD2F3;color:#3730A3;box-shadow:none}
+.btn.red{background:#fff;border:1.5px solid #F43F5E;color:#E11D48;box-shadow:none}
 .row{display:flex;gap:10px;flex-wrap:wrap}
 .row>div{flex:1;min-width:120px}
-.stat{display:inline-block;background:#1d1d26;border:1px solid var(--line);border-radius:10px;padding:8px 14px;margin:4px;font-size:13px}
-.stat b{color:var(--gold2);font-size:18px;font-family:Syne}
-.unit{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:13px;display:flex;gap:8px;align-items:center}
+.stat{display:inline-block;background:#EEF2FF;border:1px solid var(--line);border-radius:12px;padding:8px 14px;margin:4px;font-size:13px}
+.stat b{color:#3730A3;font-size:18px;font-family:Syne,sans-serif}
+.unit{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:13px;display:flex;gap:8px;align-items:center}
 .unit .u{flex:1}
-.tag{font-size:9px;background:#26210f;color:var(--gold2);border-radius:8px;padding:1px 6px}
-.tag.rv{background:#0f2a20;color:var(--acc)}
-a{color:var(--acc)}
+.tag{font-size:9.5px;font-weight:700;background:#FFF1D6;color:#B45309;border-radius:8px;padding:2px 7px}
+.tag.rv{background:#DDF7F3;color:#06796E}
+a{color:#4F46E5}
 .hidden{display:none}
 .audit{font-size:11.5px;color:var(--dim);font-family:monospace;border-top:1px solid var(--line);padding-top:8px;margin-top:10px}
-.ok{color:var(--acc);font-weight:700}.err{color:#f87171;font-weight:700}
+.ok{color:#0B9A8D;font-weight:700}.err{color:#E11D48;font-weight:700}
+button:focus-visible{outline:3px solid rgba(79,70,229,.45);outline-offset:2px}
 </style>
 </head>
 <body>
-<h1>⚙️ Admin Maestro Vokasi</h1>
+<div class="brandbar"><img src="logo-dharma-labs.png" alt="Dharma-Labs Digital"><h1>Admin Maestro Vokasi</h1></div>
 <div class="sub">Panel pengelola kurikulum & statistik — Dharma Labs Digital</div>
 
 <div id="login" class="card">
