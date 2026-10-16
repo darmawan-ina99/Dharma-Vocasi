@@ -548,7 +548,7 @@ function pushSync() {
     .catch(function () { MV.busy = false; setTimeout(pushSync, 20000); });
 }
 function pullSync() {
-  mvRpc('mv_get', { p_app: MV.app, p_key: MV.dk }).then(function (d) {
+  mvRpc('mv_get', { p_app: MV.app, p_key: MV.dk, p_usecret: MV.us }).then(function (d) {
     if (!d || !d.progress) return;
     var changed = false;
     for (var id in d.progress) {
@@ -697,7 +697,7 @@ function makeCert(){
   $('certArea').style.display='block';
   try{fitCertName();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){fitCertName()})}catch(e){}
   $('crtKode').textContent='Menerbitkan sertifikat…';
-  mvRpc('mv_issue', { p_app: MV.app, p_key: MV.dk, p_program: pk.value })
+  mvRpc('mv_issue', { p_app: MV.app, p_key: MV.dk, p_program: pk.value, p_usecret: MV.us })
     .then(function (r) {
       if (r && r.ok) {
         $('crtKode').textContent = 'Kode Verifikasi: ' + r.code + ' · Diterbitkan: ' + tgl;
