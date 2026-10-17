@@ -1,0 +1,8 @@
+-- ROLLBACK tambahan untuk migration 20261016_mv_security_hardening (jalankan SETELAH ROLLBACK_functions_20261016.sql)
+-- Perubahan skema bersifat aditif; kolom baru boleh dibiarkan (tidak mengganggu fungsi lama).
+-- Jika ingin benar-benar dibersihkan (opsional, TIDAK menghapus data pengguna selain hash baru):
+--   alter table public.mv_users    drop column if exists usecret_hash;   -- PERINGATAN: akun yang sudah dimigrasi ke hash kehilangan kuncinya
+--   alter table public.mv_lockouts drop column if exists streak;
+-- Disarankan: JANGAN drop kolom; cukup pulihkan fungsi. Akun yang sudah ber-hash tetap aman, tapi fungsi lama
+-- membaca kolom plaintext 'usecret' (null untuk akun termigrasi) sehingga akun tsb diperlakukan 'belum terkunci' oleh fungsi LAMA.
+-- Mitigasi: sebelum rollback, salin: update public.mv_users set usecret = null where usecret_hash is not null; (tidak ada cara mengembalikan plaintext dari hash)
